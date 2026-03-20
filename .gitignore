@@ -1,0 +1,26 @@
+# Build outputs
+app/build/
+build/
+.gradle/
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Backups (large, versioned separately)
+backups/
+
+# Review state
+design-review.json
+
+# Old APKs (keep only the named release)
+*.apk
+!Expert App Net Box Setup Flow_Semwal_V1.apk

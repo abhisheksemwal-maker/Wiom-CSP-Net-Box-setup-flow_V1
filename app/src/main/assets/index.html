@@ -1,0 +1,2768 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+<title>Wiom Partner App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;width:100%;font-family:'Noto Sans Devanagari','Noto Sans',sans-serif;background:#FAF9FC;color:#161021;-webkit-tap-highlight-color:transparent;overflow:hidden}
+:root{
+  --brand:#D9008D;--brand-light:#FFE5F6;--brand-sec:#FFCCED;
+  --header:#443152;--header-light:#60506C;
+  --pri:#161021;--sec:#665E75;--hint:#A7A1B2;
+  --border:#E8E4F0;--border-focus:#352D42;
+  --bg:#FAF9FC;--card:#FFFFFF;--n100:#F1EDF7;--n200:#E8E4F0;
+  --pos:#008043;--neg:#D92130;--warn:#FF8000;--warn-txt:#B85C00;--warn-bg:#FFE6CC;
+  --info:#6D17CE;--info-bg:#F1E5FF;
+  --cta-dis:#A7A1B2;
+  --green-bg:#C9F0DD;
+  --sh1:0 1px 3px rgba(0,0,0,0.15);--sh2:0 2px 6px rgba(0,0,0,0.15);
+}
+/* Status Bar 24dp — only used as fallback; real Android uses system bar */
+.sb{height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font-size:14px;font-family:'Noto Sans',sans-serif;font-weight:500}
+.sb.dk{background:var(--header);color:#faf9fc}
+.sb.lt{background:var(--bg);color:var(--pri)}
+.sb .ic{display:flex;gap:4px;align-items:center}
+.sb .ic .mi{font-size:16px}
+/* App Bar 56dp */
+.ab{height:56px;display:flex;align-items:center;padding:0 16px;gap:12px}
+.ab.dk{background:var(--header);color:#faf9fc;box-shadow:var(--sh1)}
+.ab.lt{background:var(--bg);color:var(--pri)}
+.ab .bk{background:none;border:none;color:inherit;cursor:pointer;display:flex;padding:0}
+.ab .bk .mi{font-size:24px}
+.ab .tt{font-size:16px;font-weight:700;flex:1;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ab .hp{color:var(--brand);font-size:14px;font-weight:600;cursor:pointer}
+/* Screen */
+.scr{display:none;flex-direction:column;height:100vh;width:100vw;position:absolute;top:0;left:0;background:var(--bg);z-index:1}
+.scr.on{display:flex;z-index:10}
+.bd{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+/* Overlay */
+.ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(22,16,33,0.5);z-index:100;align-items:center;justify-content:center}
+.ov.on{display:flex}
+/* CTA */
+.cta{width:100%;height:48px;border-radius:16px;background:var(--brand);color:#faf9fc;font-family:inherit;font-size:16px;font-weight:700;line-height:24px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cta:active{opacity:0.85}
+.cta:disabled{background:var(--cta-dis);cursor:not-allowed;opacity:0.7}
+/* Checkbox — uses Figma SVG icons */
+.cb{width:24px;height:24px;flex-shrink:0;background:url('img/checkbox_unchecked.svg') no-repeat center/contain;cursor:pointer;transition:0.2s}
+.cb.on{background-image:url('img/checkbox_checked.svg')}
+/* Material icon alias */
+.mi{font-family:'Material Icons Round'}
+.mo{font-family:'Material Icons Outlined'}
+/* Review mode highlights */
+.review-highlight{outline:2px solid #D9008D !important;outline-offset:1px}
+.review-selected{outline:3px solid #00e676 !important;outline-offset:1px}
+/* Animations */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.fi{animation:fadeIn 0.3s ease}
+/* Rating pill with single moving silver stroke along border */
+.rating-pill{position:relative;padding:1.5px;border-radius:15px;margin-right:12px;overflow:hidden}
+.rating-pill::before{content:'';position:absolute;inset:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent 0deg,transparent 330deg,#C0C0C0 345deg,#E8E8E8 355deg,transparent 360deg);animation:spin 2.5s linear infinite;transform-origin:center}
+.rating-pill-inner{position:relative;z-index:1;background:var(--header-light);border-radius:13px;height:25px;padding:0 8px;display:flex;align-items:center;justify-content:center;gap:4px}
+/* Gold star SVG */
+.gold-star{width:14px;height:14px;flex-shrink:0}
+/* Step progress ring */
+.step-ring{position:relative;width:36px;height:36px;flex-shrink:0}
+.step-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.step-ring .track{fill:none;stroke:var(--brand-sec);stroke-width:2.5}
+.step-ring .progress{fill:none;stroke:var(--brand);stroke-width:2.5;stroke-linecap:round;transition:stroke-dashoffset 0.6s ease}
+.step-ring span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--brand)}
+/* Pink arc spinner */
+.spinner{width:24px;height:24px;border-radius:50%;border:3px solid var(--n200);border-top-color:var(--brand);animation:spin 0.8s linear infinite;flex-shrink:0}
+/* Shutter button */
+.shutter{width:64px;height:64px;border-radius:50%;background:#D9D9D9;border:2px solid #E8E4F0;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.shutter-inner{width:54px;height:54px;border-radius:50%;background:#FAF9FC}
+/* Aadhaar guide rectangle */
+.guide-rect{border:2px dashed rgba(255,255,255,0.6);border-radius:8px;width:80%;height:200px;display:flex;align-items:center;justify-content:center}
+/* Checklist connector */
+.cl-line{margin-left:11px;width:2px;height:16px;background:var(--n200)}
+.cl-done{width:24px;height:24px;border-radius:50%;background:var(--pos);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cl-pending{width:24px;height:24px;border-radius:50%;border:2px solid var(--n200);flex-shrink:0}
+/* Photo placeholder */
+.photo-slot{width:140px;height:100px;border-radius:8px;background:var(--n200);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.photo-slot img{width:100%;height:100%;object-fit:cover}
+/* Info card */
+.info-card{border-radius:12px;overflow:hidden;margin-bottom:16px}
+.info-card-head{padding:12px 16px;background:var(--header);color:#faf9fc;font-size:14px;font-weight:600}
+.info-card-body{padding:16px;background:var(--card);border:1px solid var(--n200);border-top:none;border-radius:0 0 12px 12px}
+/* ISP form input fields — DS Input-Field component states (Figma 258:6045) */
+/* Default: label bold, border #D7D3E0, bg #FAF9FC, placeholder #A7A1B2 fw:400 */
+/* Active (focused): label normal, border #352D42, caret #D9008D */
+/* Active Filled: label normal, border #352D42, text #161021 fw:700, caret #D9008D */
+/* Filled (blurred with value): label normal, border #D7D3E0, text #161021 fw:700 */
+/* Success (.validated): border #008043 */
+/* Pre-Filled (.prefilled): bg #D7D3E0, text #665E75 fw:700, readonly */
+/* Error (.error): border #D92130 + subtext */
+.isp-field{display:flex;flex-direction:column;gap:8px}
+.isp-field label{font-size:16px;font-weight:700;color:#161021;line-height:24px;transition:font-weight 0.15s}
+.isp-field.active label{font-weight:400}
+.isp-field.filled label{font-weight:400}
+.isp-field .isp-input{height:48px;background:#FAF9FC;border:1px solid #D7D3E0;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;transition:border-color 0.15s;overflow:hidden}
+.isp-field.active .isp-input{border-color:#352D42}
+.isp-field .isp-input .mi{font-size:24px;color:#A7A1B2;flex-shrink:0}
+.isp-field .isp-input input{border:none;background:transparent;font-family:inherit;font-size:16px;font-weight:700;color:#161021;flex:1;min-width:0;outline:none;line-height:24px;caret-color:#D9008D}
+.isp-field .isp-input input::placeholder{font-weight:400;color:#A7A1B2}
+.isp-field.prefilled .isp-input{background:#D7D3E0;border-color:#D7D3E0}
+.isp-field.prefilled .isp-input input{color:#665E75}
+.isp-field.error .isp-input{border-color:#D92130}
+.isp-field .isp-error{font-size:14px;font-weight:400;color:#D92130;line-height:20px;display:none}
+.isp-field.error .isp-error{display:block}
+.isp-radio.selected{background:#FFCCED !important;border-color:#D9008D !important}
+/* Bottom Sheet */
+.bs-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(22,16,33,0.5);z-index:200}
+.bs-overlay.on{display:block}
+.bs-panel{position:absolute;bottom:0;left:0;width:100%;background:#FAF9FC;border-radius:24px 24px 0 0;transform:translateY(0);transition:transform 0.3s ease;touch-action:none}
+.bs-overlay:not(.on) .bs-panel{transform:translateY(100%)}
+.isp-radio.selected .radio-dot{fill:#D9008D}
+.isp-radio.selected circle:first-child{stroke:#D9008D}
+.isp-field.validated .isp-input{border-color:#008043 !important}
+.isp-field.validated label{font-weight:400}
+.vlan-opt:active{background:#F1EDF7}
+.vlan-opt.selected{background:#F1EDF7}
+/* Numeric keypad buttons */
+.numkey{height:41px;border-radius:100px;background:rgba(255,255,255,0.1);border:none;color:#FAF9FC;font-family:inherit;font-size:21px;font-weight:400;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.numkey:active{opacity:0.7}
+</style>
+</head>
+<body>
+
+<!-- ===== S1: TASK LIST (Figma S01) ===== -->
+<div class="scr on" id="s1">
+  <!-- Header: logo, name, rating, menu -->
+  <div style="background:var(--header);height:56px;padding:12px 16px;display:flex;align-items:center;box-shadow:var(--sh1)">
+    <img src="img/wiom_logo.webp" style="width:32px;height:32px;border-radius:4px;border:1px solid var(--border);background:#2f1940" alt="">
+    <span style="font-size:16px;font-weight:700;color:#faf9fc;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:12px">Rohit Kumar Chaurasia</span>
+    <div class="rating-pill">
+      <div class="rating-pill-inner">
+        <svg class="gold-star" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#F2E983" stroke="#D5AF4A" stroke-width="1"/></svg>
+        <span style="font-size:14px;font-weight:600;color:#faf9fc">4.8</span>
+      </div>
+    </div>
+    <span class="mi" style="font-size:24px;color:#faf9fc;cursor:pointer">menu</span>
+  </div>
+  <!-- Tabs -->
+  <div style="background:var(--header);display:flex;height:48px">
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;border-bottom:4px solid var(--border)"><span style="font-size:14px;font-weight:600;color:#faf9fc">मेरे काम</span></div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center"><span style="font-size:14px;font-weight:400;color:#faf9fc">मेरी कमाई</span></div>
+  </div>
+  <div class="bd" style="padding:16px">
+    <!-- Task card -->
+    <div class="fi" style="background:var(--brand-light);border:1px solid var(--brand);border-radius:16px;padding:24px;display:flex;gap:16px;align-items:center;cursor:pointer" onclick="startFreshFlow()">
+      <div style="flex:1">
+        <div style="font-size:48px;font-weight:700;line-height:64px">02</div>
+        <div style="display:flex;margin:16px 0;padding-right:8px">
+          <img src="img/avatar1.webp" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--card)" alt="">
+          <img src="img/avatar2.webp" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--card);margin-left:-8px" alt="">
+        </div>
+        <div style="font-size:20px;font-weight:700;line-height:28px">कस्टमर प्रतीक्षा कर रहे हैं</div>
+      </div>
+      <div style="width:72px;height:72px;border-radius:36px;background:var(--brand);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(217,0,141,0.3);flex-shrink:0">
+        <span class="mi" style="font-size:36px;color:#fff">arrow_forward</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S2: TASK DETAIL (Figma S02) — snap-scroll carousel ===== -->
+<div class="scr" id="s2">
+  <div class="ab dk">
+    <button class="bk" onclick="go('s1')"><span class="mi" style="font-size:24px">arrow_back</span></button>
+    <span class="tt">मेरे काम (2)</span>
+  </div>
+  <!-- Dark bg with curved bottom -->
+  <div style="flex:1;background:var(--bg);position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:-4px;right:-4px;bottom:84px;background:#201726;border-radius:0 0 50% 50% / 0 0 48px 48px"></div>
+    <!-- Snap-scroll card carousel -->
+    <div style="position:relative;z-index:2;height:100%;overflow-y:auto;scroll-snap-type:y mandatory;padding:24px 16px">
+      <!-- Card 1: Himanshu Singh — IN-PROGRESS (2/8), 45% time remaining -->
+      <div style="scroll-snap-align:center;min-height:calc(100% - 48px);display:flex;align-items:center;margin-bottom:24px">
+        <div class="fi" style="background:#FAF9FC;border:1px solid var(--brand);border-radius:16px;overflow:hidden;width:100%;box-shadow:0 4px 16px rgba(0,0,0,0.2)">
+          <div style="background:var(--brand-light);border-bottom:1px solid var(--brand);padding:24px 16px 16px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:20px;font-weight:700;line-height:28px">नया सेटअप</span>
+            <div class="step-ring"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="15"/><circle class="progress" cx="18" cy="18" r="15" stroke-dasharray="94.25" stroke-dashoffset="94.25"/></svg><span>0/8</span></div>
+          </div>
+          <div style="padding:16px">
+            <div style="display:flex;align-items:center;gap:12px;padding:6px 0">
+              <span class="mi" style="font-size:24px;color:var(--hint)">person</span>
+              <span style="font-size:16px;font-weight:700;line-height:24px;flex:1">Himanshu Singh</span>
+              <span class="mi" style="font-size:24px;color:var(--brand);cursor:pointer">phone</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:6px 0">
+              <span class="mi" style="font-size:24px;color:var(--hint)">location_on</span>
+              <span style="font-size:16px;font-weight:400;line-height:24px;flex:1">G 69, Mata mandir, 3rd street, Ghaziabad Uttar Pradesh</span>
+            </div>
+            <!-- Timeline: FRESH state — ball at left, full green bar, bat at right -->
+            <div style="position:relative;margin:16px 0 0">
+              <div style="position:relative;height:28px;margin-bottom:4px">
+                <img src="img/cricket_ball.svg" style="width:24px;height:24px;position:absolute;left:0;bottom:0;z-index:2" alt="">
+                <img src="img/cricket_bat.svg" style="width:32px;height:32px;position:absolute;right:0;bottom:0;z-index:2" alt="">
+              </div>
+              <div style="width:100%;height:6px;background:#D7D3E0;border-radius:3px;position:relative">
+                <div style="position:absolute;right:0;width:100%;height:100%;background:#008043;border-radius:3px"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px">
+              <span style="font-size:12px;color:var(--pri)">10:00am</span>
+              <span style="font-size:12px;color:var(--pri)"><span style="font-weight:600">12 January</span> तक काम पूरा करें</span>
+            </div>
+          </div>
+          <div style="background:var(--brand);padding:16px;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="resumeFlow()">
+            <span style="font-size:16px;font-weight:700;color:#faf9fc;line-height:24px">काम पूरा करें</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card 2: Sanjay Singh Chauhan — NEW (0/8), late state -->
+      <div style="scroll-snap-align:center;min-height:calc(100% - 48px);display:flex;align-items:center;margin-bottom:24px">
+        <div style="background:#FAF9FC;border:1px solid var(--brand);border-radius:16px;overflow:hidden;width:100%;box-shadow:0 4px 16px rgba(0,0,0,0.2)">
+          <div style="background:var(--brand-light);border-bottom:1px solid var(--brand);padding:24px 16px 16px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:20px;font-weight:700;line-height:28px">नया सेटअप</span>
+            <div class="step-ring"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="15"/><circle class="progress" cx="18" cy="18" r="15" stroke-dasharray="94.25" stroke-dashoffset="94.25"/></svg><span>0/8</span></div>
+          </div>
+          <div style="padding:16px">
+            <div style="display:flex;align-items:center;gap:12px;padding:6px 0">
+              <span class="mi" style="font-size:24px;color:var(--hint)">person</span>
+              <span style="font-size:16px;font-weight:700;line-height:24px;flex:1">Sanjay Singh Chauhan</span>
+              <span class="mi" style="font-size:24px;color:var(--brand);cursor:pointer">phone</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:12px;padding:6px 0">
+              <span class="mi" style="font-size:24px;color:var(--hint)">location_on</span>
+              <span style="font-size:16px;font-weight:400;line-height:24px;flex:1">B 12, Shiv Colony, Sector 5, Noida Uttar Pradesh</span>
+            </div>
+            <!-- Timeline: LATE state — BAT(left) BALL(mid) WICKET(right), RED bar, frozen -->
+            <div style="position:relative;margin:16px 0 0">
+              <div style="position:relative;height:32px;margin-bottom:4px">
+                <!-- Wicket flush with right edge of bar -->
+                <img src="img/wicket.svg" style="width:24px;height:32px;position:absolute;right:0;bottom:0" alt="">
+                <!-- Ball 8px left of wicket -->
+                <img src="img/cricket_ball.svg" style="width:24px;height:24px;position:absolute;right:32px;bottom:4px" alt="">
+                <!-- Bat 8px left of ball -->
+                <img src="img/bat_only.svg" style="width:32px;height:32px;position:absolute;right:64px;bottom:0" alt="">
+              </div>
+              <!-- Track with RED segment at far right -->
+              <div style="width:100%;height:6px;background:#D7D3E0;border-radius:3px;position:relative">
+                <div style="position:absolute;right:0;width:18%;height:100%;background:#D92130;border-radius:3px"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px">
+              <span style="font-size:12px;color:var(--pri)">10:00am</span>
+              <span style="font-size:12px;color:var(--pri);font-weight:600">आप लेट हो गए हो</span>
+            </div>
+          </div>
+          <div style="background:var(--brand);padding:16px;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="go('s3')">
+            <span style="font-size:16px;font-weight:700;color:#faf9fc;line-height:24px">जल्दी काम पूरा करें</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S3: PAYG ACKNOWLEDGEMENT (Figma 219:16949 → 219:17009) ===== -->
+<!-- SPEC:219:16949
+Content: 312×252, x:24, y:194, layout:V gap:16
+  Illustration: 108×108 speaker badge (payg_speaker.svg)
+  Headline: "PayG सेटअप में सिर्फ ₹300 सिक्योरिटी फीस होती है" fs:24 fw:700 tc:#161021
+  Subtitle: "कस्टमर सिर्फ ₹300 सिक्योरिटी फीस ही पे करता है, नेट बॉक्स के लिए" fs:16 fw:400 tc:#000000
+  Audio bar: 312×4, x:24, y:668, track:#F1EDF7, progress:#D9008D
+SPEC:219:17009
+  Same content + checkbox at x:24, y:640, gap:8
+  "मैंने समझ लिया है, इस सेटअप में ₹300 के अलावा कोई और पेमेंट" fs:16 fw:700 tc:#161021
+-->
+<div class="scr" id="s3">
+  <audio id="s3-audio" preload="auto" src="img/payg_acceptance.mp3"></audio>
+  <!-- Content: x:24, y:194, 312px wide, layout:V gap:16 -->
+  <div class="bd" style="padding:194px 24px 0 24px">
+    <!-- Illustration: 108×108, left-aligned -->
+    <img src="img/payg_speaker.svg" style="width:108px;height:108px;margin-bottom:16px;display:block" alt="">
+    <!-- Headline: fs:24 fw:700 tc:#161021 -->
+    <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021;margin-bottom:16px">PayG सेटअप में सिर्फ ₹300 सिक्योरिटी फीस होती है</p>
+    <!-- Subtitle: fs:16 fw:400 tc:#000000 -->
+    <p style="font-size:16px;font-weight:400;line-height:24px;color:#000000">कस्टमर सिर्फ ₹300 सिक्योरिटी फीस ही पे करता है, नेट बॉक्स के लिए</p>
+  </div>
+  <!-- Audio progress bar: 312×4, x:24, y:668, track #F1EDF7, progress #D9008D -->
+  <div id="s3-bar-wrap" style="padding:0 24px 16px;flex-shrink:0">
+    <div style="width:100%;height:4px;background:#F1EDF7;border-radius:2px;overflow:hidden">
+      <div id="s3-progress" style="width:0%;height:100%;background:#D9008D;border-radius:2px;transition:width 0.5s linear"></div>
+    </div>
+  </div>
+  <!-- Checkbox: hidden initially, shown after audio (219:17009) -->
+  <div id="s3-agree" style="display:none;padding:0 24px 24px;flex-shrink:0">
+    <div style="display:flex;align-items:flex-start;gap:8px;cursor:pointer" onclick="paygAgree(this)">
+      <div class="cb" id="payg-cb"></div>
+      <p style="font-size:16px;font-weight:700;line-height:24px;color:#161021">मैंने समझ लिया है, इस सेटअप में ₹300 के अलावा कोई और पेमेंट नहीं होती है</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S4: TRANSFER INFO (Figma S06, with S07/S08/S10 dialogs) ===== -->
+<!-- Two states: pre-call (simple) → post-call (expanded with family#, Aadhaar, ISP, payment) -->
+<div class="scr" id="s4">
+  <!-- Header: back + title (changes post-call) + more_vert -->
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px">
+    <div style="flex:1;display:flex;align-items:center;gap:4px">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="go('s3')"><span class="mi" style="font-size:24px;color:var(--pri)">arrow_back</span></button>
+      <span style="font-size:16px;font-weight:700;line-height:24px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">नया सेटअप</span>
+    </div>
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px"><img src="img/ic_more.svg" style="width:24px;height:24px" alt=""></button>
+  </div>
+  <div class="bd" style="padding:0 16px 16px">
+    <!-- Deadline card — bordered, with alarm icon (SVG from Figma) -->
+    <div class="fi" style="border:1px solid var(--border);border-radius:12px;padding:16px 12px;display:flex;align-items:center;gap:4px;margin-bottom:16px">
+      <img src="img/ic_alarm.svg" style="width:24px;height:24px;flex-shrink:0" alt="">
+      <span style="font-size:16px;font-weight:700;line-height:24px;color:var(--warn-txt)">12 January</span>
+      <span style="font-size:16px;font-weight:400;line-height:24px">से पहले नेट चालू करना है</span>
+    </div>
+    <!-- Customer Info V3 — elevated card + connected tip below -->
+    <div style="margin-bottom:16px">
+      <!-- Customer Info card: border + shadow, radius 12, padding [16,12,16,12] -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 12px;box-shadow:var(--sh1);position:relative;z-index:1">
+        <!-- Name row — all icons from Figma SVG -->
+        <div style="display:flex;align-items:center;gap:8px;padding:0 0 12px">
+          <img src="img/ic_user.svg" style="width:24px;height:24px;flex-shrink:0" alt="">
+          <span style="font-size:16px;font-weight:700;line-height:24px;flex:1">Himanshu Singh</span>
+          <div style="display:flex;gap:16px">
+            <img src="img/ic_call_btn.svg" style="width:32px;height:32px;cursor:pointer" onclick="simulateCall()" alt="">
+            <img src="img/ic_direction_btn.svg" style="width:32px;height:32px;cursor:pointer" alt="">
+          </div>
+        </div>
+        <!-- Address row -->
+        <div style="display:flex;align-items:flex-start;gap:8px;padding:0 0 12px">
+          <img src="img/ic_pin.svg" style="width:24px;height:24px;flex-shrink:0" alt="">
+          <span style="font-size:14px;font-weight:400;line-height:20px;flex:1">G 69, Mata mandir, 3rd street, Ghaziabad Uttar Pradesh</span>
+        </div>
+        <!-- Speed detail row — visible in pre-call state per Figma 200:5143 -->
+        <div style="display:flex;align-items:center;gap:8px">
+          <img src="img/ic_speed.svg" style="width:24px;height:24px;flex-shrink:0" alt="">
+          <span style="font-size:14px;font-weight:400;line-height:20px">100 Mbps</span>
+          <span style="font-size:12px;font-weight:400;color:var(--hint)">स्पीड</span>
+        </div>
+        <!-- Family number row — revealed post-call, ticket icon from Figma SVG -->
+        <div id="s4-family" style="display:none;align-items:center;gap:8px;margin-top:12px">
+          <img src="img/ic_ticket.svg" style="width:24px;height:24px;flex-shrink:0" alt="">
+          <span style="font-size:14px;font-weight:400;line-height:20px;flex:1">फैमिली नंबर : 98765 43210</span>
+        </div>
+      </div>
+      <!-- Tip bar: connected below card, -12dp overlap, auto-height, icon+text top-aligned -->
+      <div style="background:var(--info-bg);border-radius:0 0 12px 12px;margin-top:-12px;padding:23px 12px 12px;display:flex;gap:8px;align-items:flex-start">
+        <span class="mi" style="font-size:24px;color:var(--info);flex-shrink:0;line-height:16px">emoji_objects</span>
+        <p style="font-size:12px;font-weight:600;line-height:16px;color:var(--info)">कस्टमर को कॉल करके, अपने पहुंचने का समय बता दें</p>
+      </div>
+    </div>
+  </div>
+  <!-- ISP prefill card — screen level, post-call (hidden initially) -->
+  <!-- #E1FAED bg, 1px #A5E5C6 border, r=8, rocket tag + arrow per Figma 212:6236 -->
+  <div id="s4-isp-card" style="display:none;margin:0 16px 16px;background:#E1FAED;border:1px solid #A5E5C6;border-radius:8px;padding:16px 12px 12px 12px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="flex:1">
+        <div style="display:inline-flex;align-items:center;gap:8px;background:var(--pos);border:1px solid var(--border);border-radius:12px;padding:4px 12px;margin-bottom:12px">
+          <img src="img/ic_rocket.svg" style="width:24px;height:24px" alt="">
+          <span style="font-size:14px;font-weight:600;color:#FAF9FC;line-height:20px">सेटअप पर 15 मिनट बचाएँ</span>
+        </div>
+        <div style="padding-left:8px"><span style="font-size:16px;font-weight:400;line-height:24px">अब ISP अकाउंट की डिटेल्स पहले भर लें</span></div>
+      </div>
+      <img src="img/ic_arrow_right.svg" style="width:36px;height:36px" alt="">
+    </div>
+  </div>
+  <!-- CTA — 40px above bottom edge (24+16 per user), flex-shrink:0 to stay pinned -->
+  <div style="padding:0 16px 24px;flex-shrink:0"><button class="cta" id="s4-cta" onclick="showOv('ov-3pin')">सेटअप शुरू करें</button></div>
+
+  <!-- 3-pin plug dialog — shows FIRST per Figma flow (200:5259) -->
+  <div class="ov" id="ov-3pin">
+    <div class="fi" style="background:var(--card);border-radius:24px;padding:32px 24px;width:calc(100% - 48px);max-width:312px;box-shadow:var(--sh2)">
+      <!-- Image FIRST per Figma — no tick icon -->
+      <div style="background:var(--info-bg);border-radius:12px;overflow:hidden;margin-bottom:24px;display:flex;justify-content:center">
+        <img src="img/threepin_plug.webp" style="height:200px;object-fit:contain" alt="">
+      </div>
+      <p style="font-size:20px;font-weight:700;line-height:28px;margin-bottom:12px">नेट बॉक्स के साथ 3-पिन प्लग लगाना भी ज़रूरी है</p>
+      <div style="background:#FFE6CC;border-radius:8px;padding:16px 12px 12px 12px;margin-bottom:24px">
+        <div style="border-left:2px solid #FF7F00;padding-left:8px">
+          <p style="font-size:16px;font-weight:400;line-height:24px;color:var(--warn-txt)">3-पिन के बिना सेट अप अधूरा रहेगा</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;cursor:pointer" onclick="var c=this.querySelector('.cb');c.classList.toggle('on');if(c.classList.contains('on'))setTimeout(()=>{hideOv('ov-3pin');showOv('ov-arrival')},600)">
+        <div class="cb"></div>
+        <p style="font-size:16px;font-weight:700;line-height:24px">मैंने 3-पिन प्लग रख लिया है</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arrival dialog — shows AFTER 3-pin confirmation -->
+  <div class="ov" id="ov-arrival">
+    <div class="fi" style="background:var(--card);border-radius:24px;padding:32px 24px;width:calc(100% - 48px);max-width:312px;box-shadow:var(--sh2)">
+      <img src="img/house_graphic.svg" style="width:96px;height:96px;margin-bottom:24px" alt="">
+      <p style="font-size:24px;font-weight:700;line-height:32px;margin-bottom:24px">क्या आप कस्टमर के घर पर हैं?</p>
+      <button style="width:100%;height:48px;border-radius:16px;background:var(--brand);color:#faf9fc;font-family:inherit;font-size:16px;font-weight:700;border:none;cursor:pointer" onclick="hideOv('ov-arrival');go('s5')">हाँ, पहुँच गया हूँ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S5: SELFIE CAMERA (Figma S11/S12) — FRONT camera ===== -->
+<div class="scr" id="s5">
+  <div style="background:#000;flex:1;display:flex;flex-direction:column;color:#fff;position:relative">
+    <div style="display:flex;justify-content:space-between;padding:4px;position:relative;z-index:2">
+      <button style="background:none;border:none;color:#fff;cursor:pointer;padding:12px;display:flex" onclick="stopCam();go('s4')"><span class="mi" style="font-size:24px">close</span></button>
+      <button style="background:none;border:none;color:#fff;cursor:pointer;padding:12px;display:flex"><span class="mi" style="font-size:24px">flash_off</span></button>
+    </div>
+    <div style="padding:8px 16px 16px;position:relative;z-index:2"><p style="font-size:24px;font-weight:700;line-height:32px">व्योम एक्सपर्ट टी-शर्ट पहने हुए एक अच्छी सी सेल्फी लीजिए</p></div>
+    <!-- Live camera viewfinder -->
+    <div style="flex:1;position:relative;overflow:hidden">
+      <video id="cam-selfie" autoplay playsinline muted style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)"></video>
+    </div>
+    <div style="padding:24px;display:flex;align-items:center;justify-content:center;position:relative;z-index:2">
+      <div class="shutter" onclick="captureSelfie()"><div class="shutter-inner"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S6: SELFIE REVIEW — "रॉकस्टार" (Figma S13) ===== -->
+<div class="scr" id="s6">
+  <div style="height:56px;display:flex;align-items:center;padding:0 16px">
+    <button style="background:none;border:none;cursor:pointer;display:flex" onclick="go('s5')"><span class="mi" style="font-size:24px;color:var(--pri)">arrow_back</span></button>
+  </div>
+  <!-- Title -->
+  <div style="padding:0 16px 16px">
+    <p style="font-size:24px;font-weight:700;line-height:32px">आप तो बिलकुल रॉकस्टार लग रहे हैं</p>
+  </div>
+  <!-- Photo display area — shows captured selfie -->
+  <div class="bd" style="padding:0 16px">
+    <div style="width:100%;height:456px;border-radius:16px;background:#D9D9D9;position:relative;overflow:hidden">
+      <img id="selfie-preview" style="width:100%;height:100%;object-fit:cover;transform:scaleX(-1)" alt="">
+      <button style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="go('s5')">
+        <span class="mi" style="font-size:18px;color:#fff">close</span>
+      </button>
+    </div>
+  </div>
+  <!-- CTA -->
+  <div style="padding:0 16px 24px;flex-shrink:0"><button class="cta" onclick="go('s8')">कस्टमर के आधार कार्ड की फोटो लें</button></div>
+</div>
+
+<!-- ===== S7: AADHAAR CAPTURE (Figma 200:6879) — REAR camera ===== -->
+<div class="scr" id="s7">
+  <div style="background:#000;width:100%;height:100%;position:relative;overflow:hidden">
+    <!-- Live camera feed — fills entire screen -->
+    <video id="cam-aadhaar" autoplay playsinline muted style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0"></video>
+    <!-- Dark overlay: box-shadow on the guide rect covers EVERYTHING outside it -->
+    <!-- Guide rect positioned at center-ish: top = 50% - 100px roughly -->
+    <div style="position:absolute;top:50%;left:16px;right:16px;height:199px;margin-top:-130px;border-radius:16px;border:2px dashed rgba(250,249,252,0.7);box-shadow:0 0 0 9999px rgba(0,0,0,0.55);z-index:1"></div>
+    <!-- Guide text ABOVE rectangle -->
+    <p style="position:absolute;top:50%;left:16px;right:16px;margin-top:-178px;font-size:24px;font-weight:700;line-height:32px;color:#FAF9FC;z-index:2">आधार कार्ड को इस क्षेत्र में रखें</p>
+    <!-- Close button -->
+    <button style="position:absolute;top:28px;left:4px;background:none;border:none;color:#fff;cursor:pointer;padding:12px;display:flex;z-index:3" onclick="stopCam();go('s8')"><span class="mi" style="font-size:24px">close</span></button>
+    <!-- Flash icon: top-right -->
+    <div style="position:absolute;top:40px;right:16px;z-index:3">
+      <span class="mi" style="font-size:24px;color:#fff">flash_on</span>
+    </div>
+    <!-- Timer -->
+    <div style="position:absolute;top:4px;right:56px;z-index:3">
+      <span style="font-family:'Poppins',sans-serif;font-size:16px;color:#fff">01:25</span>
+    </div>
+    <!-- Shutter button: bottom center -->
+    <div style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:3">
+      <div class="shutter" onclick="captureAadhaar()"><div class="shutter-inner"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S8: AADHAAR CAPTURE FLOW (200:6691 prompt → 200:6748 review) ===== -->
+<div class="scr" id="s8">
+  <!-- Header: close + मदद -->
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px">
+    <div style="flex:1;display:flex;align-items:center">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="go('s6')"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    </div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <!-- Title -->
+  <div style="padding:8px 16px 16px">
+    <p style="font-size:24px;font-weight:700;line-height:32px">कस्टमर से आधार कार्ड मांगे और उसकी एक अच्छी सी फोटो लें</p>
+  </div>
+  <div class="bd" style="padding:0 16px" id="s8-body">
+    <!-- STATE 1: Front prompt (200:6691) — entire card tappable -->
+    <div id="s8-front-prompt" style="background:var(--n100);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:24px;cursor:pointer" onclick="openAadhaarCam()">
+      <p style="font-size:24px;font-weight:700;line-height:32px;text-align:center">आधार : Front</p>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <span class="mo" style="font-size:64px;color:var(--hint)">photo_camera</span>
+        <span style="font-size:16px;font-weight:700;color:var(--brand)">+ फोटो लें</span>
+      </div>
+    </div>
+    <!-- STATE 2: Front captured + Back prompt (200:6748) — hidden initially -->
+    <div id="s8-review" style="display:none">
+      <!-- Captured front photo: 328×199, r=16, with retake X -->
+      <div style="width:100%;height:199px;border-radius:16px;background:#D9D9D9;position:relative;overflow:hidden;margin-bottom:16px">
+        <img id="aadhaar-front-img" style="width:100%;height:100%;object-fit:cover" alt="">
+        <button style="position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="retakeFront()">
+          <span class="mi" style="font-size:16px;color:#fff">close</span>
+        </button>
+      </div>
+      <!-- Back prompt card: lavender, entire card tappable -->
+      <div style="background:var(--n100);border-radius:16px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:24px;cursor:pointer" onclick="openAadhaarCam()">
+        <p style="font-size:24px;font-weight:700;line-height:32px;text-align:center">आधार : Back</p>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <span class="mo" style="font-size:64px;color:var(--hint)">photo_camera</span>
+          <span style="font-size:16px;font-weight:700;color:var(--brand)">+ फोटो लें</span>
+        </div>
+      </div>
+    </div>
+    <!-- STATE 3: Both captured (200:6814) — hidden initially -->
+    <div id="s8-both" style="display:none">
+      <!-- Front photo -->
+      <div style="width:100%;height:199px;border-radius:16px;background:#D9D9D9;position:relative;overflow:hidden;margin-bottom:16px">
+        <img id="aadhaar-front-final" style="width:100%;height:100%;object-fit:cover" alt="">
+        <button style="position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="retakeFront()">
+          <span class="mi" style="font-size:16px;color:#fff">close</span>
+        </button>
+      </div>
+      <!-- Back photo -->
+      <div style="width:100%;height:199px;border-radius:16px;background:#D9D9D9;position:relative;overflow:hidden">
+        <img id="aadhaar-back-final" style="width:100%;height:100%;object-fit:cover" alt="">
+        <button style="position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="retakeBack()">
+          <span class="mi" style="font-size:16px;color:#fff">close</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- CTA: only visible in state 3 (both captured) -->
+  <div id="s8-cta" style="display:none;padding:0 16px 24px;flex-shrink:0"><button class="cta" onclick="go('s8c')">आगे बढ़ें</button></div>
+</div>
+
+<!-- ===== S8C: PAYG SYSTEM INFO + AUDIO (Figma 216:16152 → 216:16253) ===== -->
+<!-- SPEC:216:16152
+No top app bar. Content at y:194.
+Illustration: 108×108 speaker icon (#4F0F98) — payg_speaker.svg
+Title: "PayG – सिस्टम जानकारी" fs:24 fw:700 tc:#161021
+Subtitle: "₹300 सिर्फ़ सिक्योरिटी फीस है" fs:24 fw:400 tc:#161021
+Info card: bg:#F1E5FF r:8 p:[16,12,12,12] gap:12
+  Tag: "अब से 2 दिन का नेट मिलेगा" bg:#6D17CE r:12 p:[4,12,4,12] fs:14 fw:600 tc:#FAF9FC
+  Content: stroke:#6D17CE L:2 p:[0,0,0,8] — mixed fs text
+Audio bar: 312×4 at bottom, track:#F1EDF7 progress:#D9008D
+CTA (state 2): "ठीक है" fs:16 fw:700 tc:#D9008D bg:#FAF9FC r:16 stroke outline
+-->
+<!-- SPEC:216:16253
+Frame 1000005838 (FRAME) 328×344 x:16 y:194 | layout:V gap:24 p:[0,0,0,0]
+  Illustration (GROUP) 108×108 x:0 y:0 — left-aligned
+  Frame 1000005840 (FRAME) 328×212 x:0 y:132 | layout:V gap:24
+    Title group (328×72, gap:8):
+      "PayG – सिस्टम जानकारी" fs:24 fw:700 tc:#161021 lh:32
+      "₹300 सिर्फ़ सिक्योरिटी फीस है" fs:24 fw:400 tc:#161021 lh:32
+    Info card (328×116, bg:#F1E5FF r:8 p:[16,12,12,12] gap:12):
+      Tag: bg:#6D17CE r:12 p:[4,12,4,12] "अब से 2 दिन का नेट मिलेगा" fs:14 fw:600 tc:#FAF9FC
+      Content: stroke:#6D17CE L:2 p:[0,0,0,8] — mixed fs text lh:24
+Primary CTA 328×48 x:16 y:656 | bg:#FAF9FC r:16 — NO border, ghost button
+  "ठीक है" fs:16 fw:700 tc:#D9008D lh:24
+-->
+<div class="scr" id="s8c">
+  <audio id="s8c-audio" preload="auto" src="img/payg_precheck.mp3"></audio>
+  <!-- Content container: x:16, y:194, 328×344, layout:V gap:24 -->
+  <div class="bd" style="padding:194px 16px 0 16px">
+    <!-- Illustration: 108×108, left-aligned (x:0 in container) -->
+    <img src="img/payg_speaker.svg" style="width:108px;height:108px;margin-bottom:24px;display:block" alt="">
+    <!-- Text area: gap:24 -->
+    <div style="margin-bottom:24px">
+      <!-- Title group: gap:8 -->
+      <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021;margin-bottom:8px">PayG – सिस्टम जानकारी</p>
+      <p style="font-size:24px;font-weight:400;line-height:32px;color:#161021">₹300 सिर्फ़ सिक्योरिटी फीस है</p>
+    </div>
+    <!-- Info card: bg:#F1E5FF r:8 p:[16,12,12,12] gap:12 -->
+    <div style="background:#F1E5FF;border-radius:8px;padding:16px 12px 12px 12px">
+      <!-- Tag: bg:#6D17CE r:12 p:[4,12,4,12] cross:CENTER main:CENTER -->
+      <div style="display:inline-flex;align-items:center;justify-content:center;background:#6D17CE;border-radius:12px;padding:4px 12px;margin-bottom:12px">
+        <span style="font-size:14px;font-weight:600;line-height:20px;color:#FAF9FC">अब से 2 दिन का नेट मिलेगा</span>
+      </div>
+      <!-- Content: stroke:#6D17CE L:2 p:[0,0,0,8] gap:8 -->
+      <div style="border-left:2px solid #6D17CE;padding-left:8px">
+        <p style="font-size:14px;font-weight:600;line-height:24px;color:#161021">सेटअप के बाद 2 दिन का नेट मिलता है।</p>
+        <p style="font-size:14px;font-weight:400;line-height:24px;color:#161021">इसके बाद रिचार्ज कस्टमर अपनी मर्ज़ी से करता है</p>
+      </div>
+    </div>
+  </div>
+  <!-- Audio progress bar: 312×4, x:24, y:668, track #F1EDF7, progress #D9008D -->
+  <div id="s8c-bar-wrap" style="padding:0 24px 16px;flex-shrink:0">
+    <div style="width:100%;height:4px;background:#F1EDF7;border-radius:2px;overflow:hidden">
+      <div id="s8c-progress" style="width:0%;height:100%;background:#D9008D;border-radius:2px;transition:width 0.5s linear"></div>
+    </div>
+  </div>
+  <!-- CTA: "ठीक है" — ghost button, bg:#FAF9FC, NO border, tc:#D9008D -->
+  <div id="s8c-cta" style="display:none;padding:0 16px 24px;flex-shrink:0">
+    <button style="width:100%;height:48px;border-radius:16px;background:#FAF9FC;border:none;color:#D9008D;font-family:inherit;font-size:16px;font-weight:700;line-height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="go('s12')">ठीक है</button>
+  </div>
+</div>
+
+<!-- ===== S9: LOADING (Figma S20) ===== -->
+<div class="scr" id="s9">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px">
+    <div style="width:48px;height:48px;border-radius:50%;border:4px solid var(--n200);border-top-color:var(--brand);animation:spin 0.8s linear infinite"></div>
+    <p style="font-size:16px;color:var(--sec)">कृपया प्रतीक्षा करें...</p>
+  </div>
+</div>
+
+<!-- ===== S10: SWITCH ON NET BOX (Figma S21) ===== -->
+<div class="scr" id="s10">
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px;justify-content:space-between">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:var(--pri)">close</span></button>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div class="bd" style="padding:0">
+    <div style="padding:8px 16px 16px"><p style="font-size:24px;font-weight:700;line-height:32px">व्योम नेट बॉक्स को स्विच ऑन करें</p></div>
+    <div style="margin:0 16px;border-radius:16px;overflow:hidden">
+      <img src="img/netbox_power.webp" style="width:100%;display:block" alt="">
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:24px 16px;cursor:pointer" onclick="var c=this.querySelector('.cb');c.classList.toggle('on');if(c.classList.contains('on'))setTimeout(()=>go('s11'),600)">
+      <div class="cb"></div>
+      <p style="font-size:16px;font-weight:700;line-height:24px">नेट बॉक्स ऑन कर दिया है</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S11: CUSTOMER DETAILS (Figma 200:5924) ===== -->
+<!-- SPEC:200:5924
+Header: close #352D42 + "मदद" #D9008D + title "कस्टमर डिटेल्स" fs:24 fw:700
+Customer Info (328×144, stroke:#E8E4F0/1px, r:12, p:[16,12,16,12]):
+  user_name icon + "Himanshu Singh" fs:16 fw:700
+  pin icon + address fs:14 fw:400
+  ticket icon + "फैमिली नंबर : 98765 43210" fs:14 fw:400
+Aadhaar card (328×152, stroke:#E8E4F0/1px, r:12, p:[16,12,16,12]):
+  "आधार कार्ड" fs:14 fw:600 + download btn (32×32, #E8E4F0, r:16)
+  2 images: 148×80, r:10, gap:8 — captured Aadhaar photos
+CTA: "ISP अकाउंट बनायें" fs:16 fw:700 tc:#FAF9FC bg:#D9008D r:16
+-->
+<div class="scr" id="s11">
+  <!-- Header: close + मदद -->
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px">
+    <div style="flex:1;display:flex;align-items:center">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    </div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <!-- Title -->
+  <div style="padding:8px 16px 16px">
+    <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">कस्टमर डिटेल्स</p>
+  </div>
+  <div class="bd" style="padding:0 16px">
+    <!-- Customer Info card: stroke:#E8E4F0/1px, r:12, p:[16,12,16,12] -->
+    <div style="background:#FAF9FC;border:1px solid #E8E4F0;border-radius:12px;padding:16px 12px;margin-bottom:16px">
+      <!-- Name row -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <img src="img/ic_user.svg" style="width:24px;height:24px;flex-shrink:0" alt="">
+        <span style="font-size:16px;font-weight:700;line-height:24px;flex:1">Himanshu Singh</span>
+      </div>
+      <!-- Address row -->
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:12px">
+        <img src="img/ic_pin.svg" style="width:24px;height:24px;flex-shrink:0" alt="">
+        <span style="font-size:14px;font-weight:400;line-height:20px;flex:1">G 69, Mata mandir, 3rd street, Ghaziabad Uttar Pradesh</span>
+      </div>
+      <!-- Family number -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <img src="img/ic_ticket.svg" style="width:24px;height:24px;flex-shrink:0" alt="">
+        <span style="font-size:14px;font-weight:400;line-height:20px">फैमिली नंबर : 98765 43210</span>
+      </div>
+    </div>
+    <!-- Aadhaar card: stroke:#E8E4F0/1px, r:12, p:[16,12,16,12] -->
+    <div style="background:#FAF9FC;border:1px solid #E8E4F0;border-radius:12px;padding:16px 12px">
+      <!-- Header: title + download button -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:14px;font-weight:600;color:#161021">आधार कार्ड</span>
+        <div style="width:32px;height:32px;border-radius:16px;background:#E8E4F0;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="saveAadhaarImages()">
+          <span class="mi" style="font-size:20px;color:#352D42">download</span>
+        </div>
+      </div>
+      <!-- Aadhaar photos: fill container width, r:10, gap:8 -->
+      <div style="display:flex;gap:8px">
+        <div style="flex:1;aspect-ratio:148/80;border-radius:10px;background:#D9D9D9;overflow:hidden">
+          <img id="s11-aadhaar-front" style="width:100%;height:100%;object-fit:cover" alt="">
+        </div>
+        <div style="flex:1;aspect-ratio:148/80;border-radius:10px;background:#D9D9D9;overflow:hidden">
+          <img id="s11-aadhaar-back" style="width:100%;height:100%;object-fit:cover" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- CTA: "ISP अकाउंट बनायें" → go to ISP audio (s15) first -->
+  <div style="padding:0 16px 24px;flex-shrink:0"><button class="cta" onclick="go('s15')">ISP अकाउंट बनायें</button></div>
+</div>
+
+<!-- ===== S15: ISP RECHARGE AUDIO (Figma 224:17548→224:17632) ===== -->
+<!-- SPEC:224:17548
+Screen 360×720 bg:#FAF9FC
+  Frame 328×188 at y:194 | layout:V gap:16
+    Illustration 108×108 (purple speaker)
+    headline "कस्टमर का 30 दिन, 100 Mbps का ISP रिचार्ज करें" fs:24 fw:700 tc:#161021
+  Progress bar 312×4 at y:668 | track:#F1EDF7 progress:#D9008D
+  [after audio] Ghost CTA "ठीक है" bg:#FAF9FC tc:#D9008D no border
+-->
+<div class="scr" id="s15">
+  <audio id="s15-audio" preload="auto" src="img/isp_recharge.mp3"></audio>
+  <!-- Content left-aligned, padding-top matching Figma y:194 -->
+  <div class="bd" style="padding-top:194px;padding-left:16px;padding-right:16px;background:#FAF9FC">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:16px">
+      <!-- Speaker illustration 108×108 -->
+      <img src="img/isp_speaker.png" style="width:108px;height:108px" alt="">
+      <!-- Headline: fs:24 fw:700 tc:#161021 -->
+      <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">कस्टमर का 30 दिन, 100 Mbps का ISP रिचार्ज करें</p>
+    </div>
+  </div>
+  <!-- Audio progress bar: 312×4, track #F1EDF7, progress #D9008D -->
+  <div id="s15-bar-wrap" style="padding:0 24px 16px;flex-shrink:0">
+    <div style="width:100%;height:4px;background:#F1EDF7;border-radius:2px;overflow:hidden">
+      <div id="s15-progress" style="width:0%;height:100%;background:#D9008D;border-radius:2px;transition:width 0.5s linear"></div>
+    </div>
+  </div>
+  <!-- CTA: "ठीक है" — ghost button → show ISP bottom sheet -->
+  <div id="s15-cta" style="display:none;padding:0 16px 24px;flex-shrink:0">
+    <button style="width:100%;height:48px;border-radius:16px;background:#FAF9FC;border:none;color:#D9008D;font-family:inherit;font-size:16px;font-weight:700;line-height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="showOv('ov-isp-sheet')">ठीक है</button>
+  </div>
+</div>
+
+<!-- ===== S16: ISP DETAILS FORM (Figma 198:72096) ===== -->
+<!-- SPEC:198:72096
+Header: close #352D42 + "मदद" #D9008D fs:14 fw:600
+Title: "ISP की डिटेल्स भरें" fs:24 fw:700 tc:#161021
+"कस्टमर डिटेल्स देखें" link fs:12 fw:600 tc:#D9008D
+Radio group: PPPoE | Static IP | DHCP — stroke:#D7D3E0/1px r:12 p:[12,12,12,12]
+  Selected: radio filled #352D42
+-->
+<div class="scr" id="s16">
+  <!-- SPEC:198:72096
+  Top app bar 360×136 | bg:#faf9fc | layout:V gap:0
+    Header 360×56 | layout:H gap:4 p:[4,4,4,4]
+      close icon #352D42
+      trailing: "मदद" fs:14 fw:600 tc:#D9008D
+    title 360×56 | layout:V gap:4 p:[8,16,16,16]
+      "ISP की डिटेल्स भरें" fs:24 fw:700 tc:#161021
+  "कस्टमर डिटेल्स देखें" 92×40 at x:252 y:84 | fs:12 fw:600 tc:#D9008D p:[12,0,12,0] — RIGHT-ALIGNED
+  Radio group 327×48 at x:16 y:152 | layout:H gap:16
+    PPPoE 96×48 | stroke:#D7D3E0/1px r:12 p:[12,12,12,12] cross:CENTER
+    Static IP 107×48 | same
+    DHCP 92×48 | same
+  -->
+  <!-- Header: close + "कस्टमर डिटेल्स देखें" (right) + मदद -->
+  <div style="height:56px;display:flex;align-items:center;padding:4px">
+    <div style="flex:1;display:flex;align-items:center">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    </div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <!-- Title row with "कस्टमर डिटेल्स देखें" right-aligned -->
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:8px 16px 16px">
+    <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">ISP की डिटेल्स भरें</p>
+    <span style="font-size:12px;font-weight:600;color:var(--brand);cursor:pointer;padding:12px 0;flex-shrink:0" onclick="showBs('bs-customer')">कस्टमर डिटेल्स देखें</span>
+  </div>
+  <div class="bd" style="padding:0 16px">
+    <!-- Radio group: 327×48, layout:H gap:16 — all 3 pills side by side -->
+    <div style="display:flex;gap:16px">
+      <!-- PPPoE 96×48 | stroke:#D7D3E0/1px r:12 p:[12] cross:CENTER gap:8 -->
+      <div class="isp-radio selected" data-isp="pppoe" onclick="selectIspType(this)" style="background:#FAF9FC;border:1px solid #D7D3E0;border-radius:12px;padding:12px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:border-color 0.15s">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="none" stroke="#352D42" stroke-width="2"/><circle class="radio-dot" cx="12" cy="12" r="6" fill="#D9008D"/></svg>
+        <span style="font-size:14px;font-weight:400;color:#161021">PPPoE</span>
+      </div>
+      <!-- Static IP 107×48 -->
+      <div class="isp-radio" data-isp="static" onclick="selectIspType(this)" style="background:#FAF9FC;border:1px solid #D7D3E0;border-radius:12px;padding:12px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:border-color 0.15s">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="none" stroke="#352D42" stroke-width="2"/><circle class="radio-dot" cx="12" cy="12" r="6" fill="none"/></svg>
+        <span style="font-size:14px;font-weight:400;color:#161021">Static IP</span>
+      </div>
+      <!-- DHCP 92×48 -->
+      <div class="isp-radio" data-isp="dhcp" onclick="selectIspType(this)" style="background:#FAF9FC;border:1px solid #D7D3E0;border-radius:12px;padding:12px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:border-color 0.15s">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="none" stroke="#352D42" stroke-width="2"/><circle class="radio-dot" cx="12" cy="12" r="6" fill="none"/></svg>
+        <span style="font-size:14px;font-weight:400;color:#161021">DHCP</span>
+      </div>
+    </div>
+    <!-- ═══ PPPoE Form: progressive fields with inline validation ═══ -->
+    <div id="isp-form-pppoe" style="display:flex;flex-direction:column;gap:24px;margin-top:24px">
+      <!-- Username: empty → focused → typed (inline submit) → validating (spinner) → validated (green check) -->
+      <div class="isp-field">
+        <label>Username</label>
+        <div class="isp-input" id="pppoe-user-wrap">
+          <span class="mi">person</span>
+          <input type="text" placeholder="उदाहरण: Estell Networks" id="isp-pppoe-user" oninput="onPppoeUserInput()">
+          <!-- Inline submit — shown when text entered -->
+          <span id="pppoe-user-submit" style="display:none;color:#D9008D;font-size:14px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0" onclick="validatePppoeUser()">सबमिट करें</span>
+          <!-- Spinner — shown during validation -->
+          <div id="pppoe-user-spinner" style="display:none;width:20px;height:20px;border:2px solid #FFCCED;border-top-color:#D9008D;border-radius:50%;flex-shrink:0;animation:spin 0.8s linear infinite"></div>
+          <!-- Green check — shown after validation -->
+          <span id="pppoe-user-check" class="mi" style="display:none;color:#008043;font-size:24px;flex-shrink:0">check_circle</span>
+        </div>
+      </div>
+      <!-- Password: masked → typing (cleartext) → masked + eye toggle -->
+      <div class="isp-field">
+        <label>Password</label>
+        <div class="isp-input" id="pppoe-pass-wrap">
+          <span class="mi">lock</span>
+          <input type="password" placeholder="Password डालें" id="isp-pppoe-pass" oninput="onPppoePassInput()">
+          <!-- Eye toggle — shown after password entered -->
+          <span id="pppoe-pass-eye" class="mi" style="display:none;color:#A7A1B2;font-size:24px;cursor:pointer;flex-shrink:0" onclick="togglePassVisibility()">visibility_off</span>
+        </div>
+      </div>
+      <!-- Service Name: pre-filled "Auto" (read-only feel) -->
+      <div class="isp-field">
+        <label>Service Name</label>
+        <div class="isp-input">
+          <span class="mi">settings</span>
+          <input type="text" value="Auto" id="isp-pppoe-service" style="color:#D9008D" readonly>
+        </div>
+      </div>
+      <!-- VLAN dropdown: hidden → appears after username validated -->
+      <div class="isp-field" id="pppoe-vlan-field" style="display:none">
+        <label>VLAN</label>
+        <div class="isp-input" style="cursor:pointer" onclick="toggleVlanDropdown()">
+          <span id="pppoe-vlan-value" style="flex:1;font-size:16px;font-weight:700;color:#161021">UNTAG</span>
+          <span class="mi" id="pppoe-vlan-chevron" style="color:#A7A1B2;font-size:24px;transition:transform 0.2s">expand_more</span>
+        </div>
+        <!-- Dropdown options -->
+        <div id="pppoe-vlan-dropdown" style="display:none;margin-top:4px;border:1px solid #E8E4F0;border-radius:12px;overflow:hidden">
+          <div class="vlan-opt" onclick="selectVlan('TAG')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:400;color:#161021;transition:background 0.15s">TAG</div>
+          <div class="vlan-opt" onclick="selectVlan('TRANSPARENT')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:400;color:#161021;border-top:1px solid #E8E4F0;transition:background 0.15s">TRANSPARENT</div>
+          <div class="vlan-opt selected" onclick="selectVlan('UNTAG')" style="padding:12px 16px;cursor:pointer;font-size:14px;font-weight:400;color:#161021;background:#F1EDF7;border-top:1px solid #E8E4F0;transition:background 0.15s">UNTAG</div>
+        </div>
+      </div>
+      <!-- VLAN ID: conditional — only when TAG selected, range 128-1492 -->
+      <div class="isp-field" id="pppoe-vlanid-field" style="display:none">
+        <label>VLAN ID (128 - 1492)</label>
+        <div class="isp-input">
+          <input type="number" placeholder="E.g 128" id="isp-pppoe-vlanid" inputmode="numeric" min="128" max="1492">
+        </div>
+      </div>
+      <!-- Net Box ID: hidden → appears after VLAN selected → typing → validated (green check) -->
+      <div class="isp-field" id="pppoe-netbox-field" style="display:none">
+        <label>नेट बॉक्स ID डालें</label>
+        <div class="isp-input" id="pppoe-netbox-wrap">
+          <span class="mi">router</span>
+          <input type="text" placeholder="उदाहरण : 123456789" id="isp-pppoe-netbox" oninput="onPppoeNetboxInput()">
+          <span id="pppoe-netbox-submit" style="display:none;color:#D9008D;font-size:14px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0" onclick="validatePppoeNetbox()">सबमिट करें</span>
+          <div id="pppoe-netbox-spinner" style="display:none;width:20px;height:20px;border:2px solid #FFCCED;border-top-color:#D9008D;border-radius:50%;flex-shrink:0;animation:spin 0.8s linear infinite"></div>
+          <span id="pppoe-netbox-check" class="mi" style="display:none;color:#008043;font-size:24px;flex-shrink:0">check_circle</span>
+        </div>
+      </div>
+    </div>
+    <!-- ═══ Static IP Form: 5 fields ═══ -->
+    <div id="isp-form-static" style="display:none;flex-direction:column;gap:24px;margin-top:24px">
+      <!-- IP Address -->
+      <div class="isp-field">
+        <label>IP Address</label>
+        <div class="isp-input">
+          <input type="text" placeholder="udaharan: 192.168.1.1" id="isp-static-ip" inputmode="decimal">
+        </div>
+      </div>
+      <!-- IPv4 Gateway -->
+      <div class="isp-field">
+        <label class="bold">IPv4 Gateway</label>
+        <div class="isp-input">
+          <input type="text" placeholder="udaharan: 192.168.1.1" id="isp-static-gw" inputmode="decimal">
+        </div>
+      </div>
+      <!-- IP Netmask -->
+      <div class="isp-field">
+        <label>IP Netmask</label>
+        <div class="isp-input">
+          <input type="text" value="255.255.255.0" id="isp-static-mask" inputmode="decimal">
+        </div>
+      </div>
+      <!-- Primary DNS -->
+      <div class="isp-field">
+        <label>Primary DNS</label>
+        <div class="isp-input">
+          <input type="text" value="8.8.8.8" id="isp-static-dns1" inputmode="decimal">
+        </div>
+      </div>
+      <!-- Secondary DNS -->
+      <div class="isp-field">
+        <label>Secondary DNS</label>
+        <div class="isp-input">
+          <input type="text" value="8.8.4.4" id="isp-static-dns2" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+    <!-- ═══ DHCP: WAN settings readout (no input fields) ═══ -->
+    <div id="isp-form-dhcp" style="display:none;flex-direction:column;gap:16px;margin-top:24px">
+      <p style="font-size:16px;font-weight:700;color:#1A1A1A;line-height:24px">Please Verify DHCP settings again</p>
+      <div style="background:var(--n100);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px">
+        <p style="font-size:16px;font-weight:400;color:#161021">Interface</p>
+        <p style="font-size:16px;font-weight:400;color:#161021">proto='dhcp'</p>
+        <p style="font-size:16px;font-weight:400;color:#161021">device='eth0.2'</p>
+        <p style="font-size:16px;font-weight:400;color:#161021">metric='10'</p>
+      </div>
+    </div>
+  </div>
+  <!-- CTA: "नेट बॉक्स तैयार करें" — hidden until VLAN ID filled (or UNTAG/TRANSPARENT selected) -->
+  <!-- Figma: Action 360×80 bg:#faf9fc p:[16] fx:DROP_SHADOW, button 328×48 bg:#d9008d r:16 -->
+  <div id="s16-cta" style="display:none;padding:16px;flex-shrink:0;background:#FAF9FC;box-shadow:0 -2px 8px rgba(0,0,0,0.1)">
+    <button class="cta" onclick="onNetboxReady()">नेट बॉक्स तैयार करें</button>
+  </div>
+</div>
+
+<!-- ===== S17: NET BOX PLACEMENT CHECK (Figma 198:67430→67358→67505) ===== -->
+<!-- Audio 10s → timer 59s countdown → checkbox "मैंने सही जगह पर रख दिया है" → s18 -->
+<div class="scr" id="s17">
+  <audio id="s17-audio" preload="auto" src="img/netbox_placement.mp3"></audio>
+  <!-- Header: close + मदद -->
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <!-- Title section -->
+  <div style="padding:8px 16px 16px">
+    <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">पक्का करें कि नेट बॉक्स किसी सही जगह रखा है</p>
+    <p style="font-size:16px;font-weight:400;line-height:24px;color:#161021;margin-top:4px">फ्रिज, टीवी और मेटल के सामान जैसे अलमारी से दूर है</p>
+  </div>
+  <div class="bd" style="padding:0 16px">
+    <!-- Placement example images FIRST (y:212) — exported from Figma 198:67485 -->
+    <div style="display:flex;justify-content:center;margin-bottom:24px">
+      <img src="img/placement_examples.png" style="width:328px;max-width:100%;height:auto" alt="Placement examples">
+    </div>
+    <!-- Timer state (state 1): spinner + countdown + hint (y:484, center-aligned) -->
+    <div id="s17-timer-state" style="display:flex;flex-direction:column;gap:8px;align-items:center">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="spinner" style="width:20px;height:20px"></div>
+        <span id="s17-timer" style="font-size:24px;font-weight:700;color:#161021">00:59</span>
+      </div>
+      <span style="font-size:14px;font-weight:400;color:#161021">इसमें 1-2 मिनट का समय लग सकता है</span>
+    </div>
+    <!-- Checkbox state (state 2): replaces timer after audio ends -->
+    <div id="s17-checkbox-state" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="placementAgree(this)">
+        <div class="cb" id="s17-cb"></div>
+        <span style="font-size:16px;font-weight:700;color:#161021">मैंने सही जगह पर रख दिया है</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S18: NET BOX PHOTO CAPTURE (Figma 198:67138) — REAR camera ===== -->
+<div class="scr" id="s18">
+  <!-- Camera viewfinder (full screen behind) -->
+  <div style="position:absolute;inset:0;background:#4D4D4D;z-index:1">
+    <video id="cam-netbox" autoplay playsinline style="width:100%;height:100%;object-fit:cover"></video>
+  </div>
+  <!-- Header overlay: transparent bg, close + title -->
+  <div style="position:relative;z-index:2">
+    <div style="display:flex;align-items:center;padding:4px">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="stopCam();go('s17')"><span class="mi" style="font-size:24px;color:#FAF9FC">close</span></button>
+    </div>
+    <div style="padding:8px 16px 24px">
+      <p style="font-size:24px;font-weight:700;line-height:32px;color:#FAF9FC">नेट बॉक्स की फोटो लें</p>
+    </div>
+  </div>
+  <!-- Shutter button at bottom center -->
+  <div style="position:absolute;bottom:48px;left:50%;transform:translateX(-50%);z-index:2">
+    <div class="shutter" onclick="captureNetboxPhoto()">
+      <div class="shutter-inner"></div>
+    </div>
+  </div>
+  <!-- Flash icon top-right -->
+  <div style="position:absolute;top:80px;right:16px;z-index:2">
+    <span class="mi" style="font-size:24px;color:#FAF9FC">flash_on</span>
+  </div>
+</div>
+
+<!-- ===== S19: NET BOX PHOTO REVIEW (Figma 198:76119) ===== -->
+<div class="scr" id="s19">
+  <!-- Header: close + मदद -->
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div class="bd" style="padding:0 16px">
+    <!-- Captured photo: 328×502, r:10, with retake X at top-right -->
+    <div style="position:relative;width:100%;border-radius:10px;overflow:hidden;background:#D9D9D9">
+      <img id="netbox-photo-preview" src="" style="width:100%;height:502px;object-fit:cover;display:block" alt="">
+      <!-- Retake button: top-right corner -->
+      <div style="position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="retakeNetboxPhoto()">
+        <span class="mi" style="font-size:20px;color:#FAF9FC">close</span>
+      </div>
+    </div>
+  </div>
+  <!-- CTA: "अब 3 पिन वाले प्लग की फोटो लें" -->
+  <div style="padding:16px;flex-shrink:0;background:#FAF9FC">
+    <button class="cta" onclick="go('s20')">अब 3 पिन वाले प्लग की फोटो लें</button>
+  </div>
+</div>
+
+<!-- ===== S20: 3-PIN PLUG INFO + AUDIO (Figma 198:76202/76277/76346) ===== -->
+<!-- Audio 2s, transition to checkbox after 4.5s. Same pattern as s17. -->
+<div class="scr" id="s20">
+  <audio id="s20-audio" preload="auto" src="img/threepin_instructions.mp3"></audio>
+  <div style="background:#FAF9FC">
+    <div style="display:flex;align-items:center;padding:4px">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+      <div style="flex:1"></div>
+      <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+    </div>
+    <div style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:4px">
+      <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">फोटो में व्योम वाला 3 पिन साफ दिखना चाहिए</p>
+      <p style="font-size:16px;font-weight:400;line-height:24px;color:#161021">नेट बॉक्स का एडाप्टर हमेशा व्योम वाले 3 पिन में ही लगाएं, फोटो में 3 पिन साफ दिखना चाहिए</p>
+    </div>
+  </div>
+  <div class="bd" style="padding:0 16px">
+    <!-- 3-pin example images (y:236) -->
+    <div style="display:flex;justify-content:center;margin-bottom:24px">
+      <img src="img/threepin_examples.png" style="width:328px;max-width:100%;height:auto" alt="3-pin examples">
+    </div>
+    <!-- Timer state (y:508, center-aligned) -->
+    <div id="s20-timer-state" style="display:flex;flex-direction:column;gap:8px;align-items:center">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="spinner" style="width:20px;height:20px"></div>
+        <span id="s20-timer" style="font-size:24px;font-weight:700;color:#161021">00:59</span>
+      </div>
+      <span style="font-size:14px;font-weight:400;color:#161021">इसमें 1-2 मिनट का समय लग सकता है</span>
+    </div>
+    <!-- Checkbox state: replaces timer after 4.5s -->
+    <div id="s20-checkbox-state" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="threepinAgree(this)">
+        <div class="cb" id="s20-cb"></div>
+        <span style="font-size:16px;font-weight:700;color:#161021">व्योम वाला 3 पिन सही से लगा दिया है</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S21: 3-PIN PLUG CAMERA (Figma 198:76502) — REAR camera ===== -->
+<div class="scr" id="s21">
+  <div style="position:absolute;inset:0;background:#4D4D4D;z-index:1">
+    <video id="cam-threepin" autoplay playsinline style="width:100%;height:100%;object-fit:cover"></video>
+  </div>
+  <div style="position:relative;z-index:2">
+    <div style="display:flex;align-items:center;padding:4px">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="stopCam();go('s20')"><span class="mi" style="font-size:24px;color:#FAF9FC">close</span></button>
+    </div>
+    <div style="padding:8px 16px 24px">
+      <p style="font-size:24px;font-weight:700;line-height:32px;color:#FAF9FC">व्योम वाले 3 पिन की फोटो लें</p>
+    </div>
+  </div>
+  <div style="position:absolute;bottom:48px;left:50%;transform:translateX(-50%);z-index:2">
+    <div class="shutter" onclick="captureThreepinPhoto()">
+      <div class="shutter-inner"></div>
+    </div>
+  </div>
+  <div style="position:absolute;top:80px;right:16px;z-index:2">
+    <span class="mi" style="font-size:24px;color:#FAF9FC">flash_on</span>
+  </div>
+</div>
+
+<!-- ===== S22: 3-PIN PLUG PHOTO REVIEW (Figma 198:76415) ===== -->
+<div class="scr" id="s22">
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div class="bd" style="padding:0 16px">
+    <div style="position:relative;width:100%;border-radius:10px;overflow:hidden;background:#D9D9D9">
+      <img id="threepin-photo-preview" src="" style="width:100%;height:502px;object-fit:cover;display:block" alt="">
+      <div style="position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="retakeThreepinPhoto()">
+        <span class="mi" style="font-size:20px;color:#FAF9FC">close</span>
+      </div>
+    </div>
+  </div>
+  <div style="padding:16px;flex-shrink:0;background:#FAF9FC">
+    <button class="cta" onclick="go('s23')">अब नेट बॉक्स और वायरिंग की फोटो लें</button>
+  </div>
+</div>
+
+<!-- ===== S23: WIRING CHECK + AUDIO (Figma 198:67210/67287/67577) ===== -->
+<!-- SPEC:198:67210
+Top app bar: light bg, close icon #352D42, "मदद" trailing
+title: "फोटो लेने से पहले पक्का करें कि वायरिंग सही से की है" fs:24 fw:700 tc:#161021
+Timer state: Loader 20×20 + "00:59" fs:24 fw:700 + hint "इसमें 1-2 मिनट का समय लग सकता है" fs:14 fw:400
+Checkbox state: "मैंने सही से वायरिंग कर ली है" fs:16 fw:700 tc:#161021
+Example images: 328×248, two 156×200 images with green/red borders + checkmarks
+Audio: 12.3s wiring_instructions.mp3, transition after 13.5s
+-->
+<div class="scr" id="s23">
+  <audio id="s23-audio" preload="auto" src="img/wiring_instructions.mp3"></audio>
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div class="bd" style="padding:8px 16px 16px">
+    <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021;margin-bottom:24px">फोटो लेने से पहले पक्का करें कि वायरिंग सही से की है</p>
+    <!-- Wiring example images FIRST -->
+    <img src="img/wiring_examples.png" style="width:100%;border-radius:10px;margin-bottom:24px" alt="Wiring examples">
+    <!-- Timer state BELOW photos (visible initially) -->
+    <div id="s23-timer-state" style="display:flex;flex-direction:column;gap:8px;align-items:center">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="spinner" style="width:20px;height:20px;border-width:2px"></div>
+        <span id="s23-timer" style="font-size:24px;font-weight:700;color:#161021">00:59</span>
+      </div>
+      <span style="font-size:14px;font-weight:400;color:#161021">इसमें 1-2 मिनट का समय लग सकता है</span>
+    </div>
+    <!-- Checkbox state BELOW photos (hidden initially) -->
+    <div id="s23-checkbox-state" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="wiringAgree(this)">
+        <div class="cb" id="s23-cb"></div>
+        <span style="font-size:16px;font-weight:700;color:#161021">मैंने सही से वायरिंग कर ली है</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S24: WIRING + NETBOX PHOTO CAMERA (Figma 198:67735) — REAR ===== -->
+<!-- SPEC:198:67735
+Camera bg: #4D4D4D, transparent header, white text
+Title: "नेट बॉक्स और वायरिंग की फोटो लें" fs:24 fw:700 tc:#FAF9FC
+Shutter button at bottom, flash icon top right
+-->
+<div class="scr" id="s24">
+  <div style="position:absolute;top:0;left:0;width:100%;z-index:10;background:transparent">
+    <div style="display:flex;align-items:center;padding:4px">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="stopCam();go('s23')"><span class="mi" style="font-size:24px;color:#FAF9FC">close</span></button>
+    </div>
+    <div style="padding:8px 16px 24px">
+      <p style="font-size:24px;font-weight:700;line-height:32px;color:#FAF9FC">नेट बॉक्स और वायरिंग की फोटो लें</p>
+    </div>
+  </div>
+  <!-- Camera viewfinder -->
+  <div style="flex:1;background:#4D4D4D;position:relative;overflow:hidden">
+    <video id="cam-wiring" autoplay playsinline style="width:100%;height:100%;object-fit:cover"></video>
+    <canvas id="snap-wiring" style="display:none"></canvas>
+  </div>
+  <!-- Flash + shutter row -->
+  <div style="position:absolute;bottom:0;left:0;width:100%;padding:24px 0 32px;display:flex;align-items:center;justify-content:center;z-index:10">
+    <div style="position:absolute;right:24px;top:24px">
+      <span class="mi" style="font-size:24px;color:#FAF9FC">flash_on</span>
+    </div>
+    <div class="shutter" onclick="captureWiringPhoto()">
+      <div class="shutter-inner"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S25: WIRING PHOTO REVIEW (Figma 198:67648) ===== -->
+<!-- SPEC:198:67648
+Photo: 328×502 r:10
+Retake: close icon on photo (absolute top-right)
+CTA: "आगे बढें" bg:#D9008D
+Header: light bg, close + मदद
+-->
+<div class="scr" id="s25">
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div class="bd" style="padding:0 16px">
+    <div style="position:relative;width:100%;border-radius:10px;overflow:hidden;background:#D9D9D9">
+      <img id="wiring-photo-preview" src="" style="width:100%;height:502px;object-fit:cover;display:block" alt="">
+      <div style="position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="retakeWiringPhoto()">
+        <span class="mi" style="font-size:20px;color:#FAF9FC">close</span>
+      </div>
+    </div>
+  </div>
+  <div style="padding:16px;flex-shrink:0;background:#FAF9FC">
+    <button class="cta" onclick="go('s26')">आगे बढें</button>
+  </div>
+</div>
+
+<!-- ===== S26: LOADING — NET BOX PREPARING (Figma 198:66888) ===== -->
+<!-- SPEC:198:66888
+Title: "नेट बॉक्स तैयार किया जा रहा है..." fs:20 fw:700 tc:#161021
+Spinner: green 20×20 #008043
+Header: light bg, close + मदद
+Centered content
+-->
+<div class="scr" id="s26">
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div class="bd" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px">
+    <div style="width:96px;height:96px;border-radius:50%;background:#C9F0DD;display:flex;align-items:center;justify-content:center">
+      <div class="spinner" style="width:48px;height:48px;border-width:4px;border-color:#C9F0DD;border-top-color:#008043"></div>
+    </div>
+    <p style="font-size:20px;font-weight:700;line-height:28px;color:#161021;text-align:center">नेट बॉक्स तैयार किया जा रहा है...</p>
+  </div>
+  <!-- Spacer matching s27 CTA height so circle stays at same vertical position -->
+  <div style="padding:16px;flex-shrink:0;visibility:hidden"><div style="height:48px"></div></div>
+</div>
+
+<!-- ===== S27: SUCCESS — NET BOX READY (Figma 198:67052) ===== -->
+<!-- SPEC:198:67052
+Green circle 96×96 bg:#C9F0DD + tick 48×48 bg:#008043
+Title: "नेट बॉक्स चालू हो गया है" fs:16 fw:700 tc:#161021
+CTA: "ऑप्टिकल पॉवर चेक करें" bg:#D9008D
+Header: light bg, close + मदद
+-->
+<div class="scr" id="s27">
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div class="bd" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px">
+    <div style="width:96px;height:96px;border-radius:50%;background:#C9F0DD;display:flex;align-items:center;justify-content:center">
+      <img src="img/tick_green.svg" style="width:48px;height:48px" alt="">
+    </div>
+    <p style="font-size:16px;font-weight:700;line-height:24px;color:#161021;text-align:center">नेट बॉक्स चालू हो गया है</p>
+  </div>
+  <div style="padding:16px;flex-shrink:0;background:#FAF9FC">
+    <button class="cta" onclick="go('s28')">ऑप्टिकल पॉवर चेक करें</button>
+  </div>
+</div>
+
+<!-- ===== S28: OPTICAL POWER CHECK (Figma 271:6046) ===== -->
+<!-- SPEC:271:6046
+Title (during check): "नेट बॉक्स तैयार किया जा रहा है..." fs:20 fw:700 tc:#161021
+Optical Power graphic: 96×96 green circle + custom SVG illustration
+Value: "-21 dB" fs:24 fw:700 tc:#008043
+Status: "ऑप्टिकल पॉवर सही है" fs:16 fw:400 tc:#008043
+CTA: "अब नेट स्पीड चेक करें" bg:#D9008D (hidden until -21 reached)
+Animation: starts 0 dB, counts -1,-2...-21, then reveals CTA
+-->
+<div class="scr" id="s28">
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div class="bd" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:16px">
+    <div style="width:96px;height:96px;border-radius:50%;background:#C9F0DD;display:flex;align-items:center;justify-content:center">
+      <img src="img/optical_power.svg" style="width:64px;height:64px" alt="">
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <span id="s28-value" style="font-size:24px;font-weight:700;color:#008043">0 dB</span>
+      <span id="s28-status" style="font-size:16px;font-weight:400;color:#161021">नेट बॉक्स तैयार किया जा रहा है...</span>
+    </div>
+  </div>
+  <div id="s28-cta-wrap" style="padding:16px;flex-shrink:0;background:#FAF9FC;visibility:hidden">
+    <button class="cta" onclick="go('s29')">अब नेट स्पीड चेक करें</button>
+  </div>
+</div>
+
+<!-- ===== S29: SPEED TEST (Figma 271:6945) ===== -->
+<!-- SPEC:271:6945
+Speedometer gauge: 202×172 SVG, needle animated
+Speed: starts 10→89 Mbps, green text fs:24 fw:700
+After animation: bottom sheet "क्या स्पीड सही आ रही है?" with "नहीं"/"हाँ" cards
+Header: light bg, close + मदद
+-->
+<div class="scr" id="s29">
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div class="bd" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:16px">
+    <!-- Lottie speedometer animation -->
+    <div id="s29-lottie" style="width:240px;height:240px"></div>
+    <span id="s29-speed" style="font-size:24px;font-weight:700;color:#008043">0 Mbps</span>
+  </div>
+</div>
+
+<!-- Bottom sheet: Speed confirmation -->
+<div class="bs-overlay" id="bs-speed" onclick="if(event.target===this)hideBs('bs-speed')">
+  <div class="bs-panel" style="padding-bottom:48px">
+    <div style="padding:12px 0 24px;display:flex;justify-content:center">
+      <div style="width:120px;height:4px;background:#D7D3E0;border-radius:4px"></div>
+    </div>
+    <div style="padding:0 16px 8px">
+      <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">क्या स्पीड सही आ रही है?</p>
+    </div>
+    <div style="padding:24px 16px;display:flex;gap:16px">
+      <div id="speed-no" style="flex:1;background:#FAF9FC;border:1px solid #D9008D;border-radius:16px;padding:24px 12px;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="selectSpeedCard('no')">
+        <span style="font-size:20px;font-weight:700;color:#D9008D">नहीं</span>
+      </div>
+      <div id="speed-yes" style="flex:1;background:#FAF9FC;border:1px solid #D9008D;border-radius:16px;padding:24px 12px;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="selectSpeedCard('yes')">
+        <span style="font-size:20px;font-weight:700;color:#D9008D">हाँ</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S30: RECHARGE INFO + AUDIO (Figma 271:7604→7659) ===== -->
+<!-- SPEC:271:7604
+NO header. Content at y:194, x:16, width:328, layout:VERTICAL gap:16
+Speaker: 108×108, left-aligned
+Headline: "अब कस्टमर अगले 2 दिन..." fs:24 fw:700 tc:#161021
+Subtitle: "इसके बाद रिचार्ज..." fs:16 fw:400 tc:#000000
+Progress bar: 312×4 at y:668 (pinned near bottom)
+Ghost CTA "समझ गया": bg:#FAF9FC tc:#D9008D r:16 (after audio)
+-->
+<div class="scr" id="s30">
+  <audio id="s30-audio" preload="auto" src="img/recharge_info.mp3"></audio>
+  <div class="bd" style="padding:194px 16px 16px 16px">
+    <!-- Content block: VERTICAL gap:16 -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <img src="img/speaker_recharge.webp" style="width:108px;height:108px" alt="">
+      <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">अब कस्टमर अगले 2 दिन तक नेट का इस्तमाल कर सकते हैं</p>
+      <p style="font-size:16px;font-weight:400;line-height:24px;color:#000000">इसके बाद रिचार्ज कस्टमर अपनी मर्ज़ी से करता है</p>
+    </div>
+  </div>
+  <!-- Progress bar pinned near bottom -->
+  <div style="padding:0 24px 36px;flex-shrink:0">
+    <div id="s30-bar-wrap" style="width:100%;height:4px;background:#F1EDF7;border-radius:4px;overflow:hidden">
+      <div id="s30-progress" style="width:0%;height:100%;background:var(--brand);border-radius:4px;transition:width 0.2s linear"></div>
+    </div>
+  </div>
+  <!-- Ghost CTA (hidden initially, appears after audio) -->
+  <div id="s30-cta-wrap" style="padding:0 16px 24px;flex-shrink:0;background:#FAF9FC;display:none">
+    <button style="width:100%;height:48px;border-radius:16px;background:#FAF9FC;border:none;color:#D9008D;font-family:inherit;font-size:16px;font-weight:700;line-height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="go('s31')">समझ गया</button>
+  </div>
+</div>
+
+<!-- ===== S31: HAPPY CODE RATING (Figma 271:7162) ===== -->
+<!-- SPEC:271:7162
+Illustration: Asset 1 1 (240×240)
+Title: "कस्टमर से उनके नेट बॉक्स सेटअप के अनुभव को रेट करने के लिए कहें" fs:24 fw:700
+CTA: "अब हैप्पी कोड डालें" bg:#D9008D → s32
+-->
+<div class="scr" id="s31">
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+  </div>
+  <div class="bd" style="padding:40px 16px 16px">
+    <div style="display:flex;justify-content:center;margin-bottom:24px">
+      <img src="img/happy_code_illust.webp" style="width:240px;height:240px" alt="">
+    </div>
+    <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">कस्टमर से उनके नेट बॉक्स सेटअप के अनुभव को रेट करने के लिए कहें</p>
+  </div>
+  <div style="padding:16px;flex-shrink:0">
+    <button class="cta" onclick="go('s32')">अब हैप्पी कोड डालें</button>
+  </div>
+</div>
+
+<!-- ===== S32: HAPPY CODE OTP ENTRY (Figma 271:7507) ===== -->
+<!-- SPEC:271:7507
+Header: close + मदद
+Title: "लॉटरी पाने के लिए हैप्पी कोड डालें" fs:24 fw:700
+4 OTP boxes: 76×48, stroke:#E8E4F0, r:12
+Hint bar: bg:#F9DFEE r:12 p:8, pink icon + "कस्टमर से उनकी ऐप में आए हैप्पी कोड को मांगे" fs:14
+Auto-transition after 4 digits → s33
+-->
+<div class="scr" id="s32">
+  <div style="display:flex;align-items:center;padding:4px;background:#FAF9FC">
+    <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    <div style="flex:1"></div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div style="padding:8px 16px 16px">
+    <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021;margin-bottom:24px">लॉटरी पाने के लिए हैप्पी कोड डालें</p>
+  </div>
+  <div class="bd" style="padding:0 16px">
+    <!-- 4 OTP input boxes -->
+    <div id="s32-otp" style="display:flex;gap:8px;margin-bottom:24px">
+      <div class="hc-digit" style="flex:1;height:48px;border-radius:12px;border:1px solid #E8E4F0;background:#FAF9FC;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#161021"></div>
+      <div class="hc-digit" style="flex:1;height:48px;border-radius:12px;border:1px solid #E8E4F0;background:#FAF9FC;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#161021"></div>
+      <div class="hc-digit" style="flex:1;height:48px;border-radius:12px;border:1px solid #E8E4F0;background:#FAF9FC;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#161021"></div>
+      <div class="hc-digit" style="flex:1;height:48px;border-radius:12px;border:1px solid #E8E4F0;background:#FAF9FC;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#161021"></div>
+    </div>
+    <!-- Pink hint bar -->
+    <div style="background:#F9DFEE;border-radius:12px;padding:8px;display:flex;align-items:center;gap:8px">
+      <img src="img/ic_bulb_pink.svg" style="width:17px;height:24px;flex-shrink:0" alt="">
+      <span style="font-size:14px;font-weight:400;color:#191919;line-height:19px">कस्टमर से उनकी ऐप में आए हैप्पी कोड को मांगे</span>
+    </div>
+  </div>
+  <!-- Numeric keypad -->
+  <div style="background:#161021;padding:16px 31px;flex-shrink:0">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px">
+      <button class="numkey" onclick="enterHappyCode('1')">1</button>
+      <button class="numkey" onclick="enterHappyCode('2')">2</button>
+      <button class="numkey" onclick="enterHappyCode('3')">3</button>
+      <button class="numkey" onclick="enterHappyCode('4')">4</button>
+      <button class="numkey" onclick="enterHappyCode('5')">5</button>
+      <button class="numkey" onclick="enterHappyCode('6')">6</button>
+      <button class="numkey" onclick="enterHappyCode('7')">7</button>
+      <button class="numkey" onclick="enterHappyCode('8')">8</button>
+      <button class="numkey" onclick="enterHappyCode('9')">9</button>
+      <button class="numkey" style="background:#FFD3CC" onclick="deleteHappyCode()"><span class="mi" style="font-size:24px;color:#E01E00">backspace</span></button>
+      <button class="numkey" onclick="enterHappyCode('0')">0</button>
+      <button class="numkey" style="background:var(--brand)" onclick="submitHappyCode()"><span class="mi" style="font-size:24px;color:#FAF9FC">keyboard_return</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S33: LOTTERY (Figma 198:68615) ===== -->
+<!-- SPEC:198:68615
+Full-screen lottery illustration (cards, sparkles, pink zigzag bg)
+Text: "समय पर नया कनेक्शन लगाने से लॉटरी लगी है" fs:16 fw:400
+Yellow CTA: "फिर से चलायें" bg:#FFD888 stroke:#FFBDB3 → reset to s1
+-->
+<div class="scr" id="s33" style="background:#FAF9FC;position:relative">
+  <img src="img/lottery_screen.webp" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0" alt="">
+  <!-- Tap target covering full bottom area for "फिर से चलायें" -->
+  <div style="position:absolute;bottom:0;left:0;width:100%;height:120px;cursor:pointer" onclick="resetFlow()"></div>
+</div>
+
+<!-- ===== OVERLAY: WiFi Connect Dialog (Android-style permission popup) ===== -->
+<div class="ov" id="ov-wifi" style="align-items:center;justify-content:center">
+  <div style="width:calc(100% - 48px);max-width:312px;background:#FFFFFF;border-radius:28px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.25)">
+    <!-- Icon -->
+    <div style="padding:24px 24px 16px;display:flex;justify-content:center">
+      <div style="width:48px;height:48px;border-radius:50%;background:#E8F5E9;display:flex;align-items:center;justify-content:center">
+        <span class="mi" style="font-size:24px;color:#2E7D32">wifi</span>
+      </div>
+    </div>
+    <!-- Title -->
+    <div style="padding:0 24px;text-align:center">
+      <p style="font-size:18px;font-weight:600;line-height:24px;color:#1C1B1F">WiFi से कनेक्ट करें</p>
+    </div>
+    <!-- Body -->
+    <div style="padding:12px 24px 0;text-align:center">
+      <p style="font-size:14px;font-weight:400;line-height:20px;color:#49454F">नेट बॉक्स के WiFi नेटवर्क से कनेक्ट करें ताकि सेटअप पूरा हो सके</p>
+    </div>
+    <!-- Network name -->
+    <div style="margin:16px 24px;padding:12px 16px;background:#F5F5F5;border-radius:12px;display:flex;align-items:center;gap:12px">
+      <span class="mi" style="font-size:20px;color:#49454F">wifi</span>
+      <span style="font-size:14px;font-weight:500;color:#1C1B1F">Wiom_GX412365</span>
+      <span class="mi" style="font-size:18px;color:#2E7D32;margin-left:auto">lock</span>
+    </div>
+    <!-- Buttons: Android Material 3 style -->
+    <div style="padding:8px 24px 24px;display:flex;justify-content:flex-end;gap:8px">
+      <button style="padding:10px 24px;background:transparent;border:none;font-family:inherit;font-size:14px;font-weight:500;color:#49454F;cursor:pointer;border-radius:20px" onclick="hideOv('ov-wifi')">रद्द करें</button>
+      <button style="padding:10px 24px;background:#2E7D32;border:none;font-family:inherit;font-size:14px;font-weight:500;color:#FFFFFF;cursor:pointer;border-radius:20px" onclick="hideOv('ov-wifi');go('s17');startPlacementCheck()">कनेक्ट करें</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BOTTOM SHEET: Customer Details (Figma 198:72375) ===== -->
+<!-- SPEC:198:72375
+bottom sheet 360×460 | layout:V gap:0 cross:CENTER
+  header 360×88 | slider 120×4 bg:#D7D3E0 r:4 | title "कस्टमर डिटेल्स" fs:24 fw:700
+  content 360×372 | layout:V gap:24 p:[24,16,48,16]
+    Customer Info 328×144 | stroke:#E8E4F0/1px r:12 p:[16,12,16,12]
+      person icon #A7A1B2 + "Himanshu Singh" fs:16 fw:700
+      pin icon #A7A1B2 + address fs:14 fw:400
+      ticket icon #A7A1B2 + "फैमिली नंबर : 98765 43210" fs:14 fw:400
+    Aadhaar card 328×140 | stroke:#E8E4F0/1px r:12 p:[16,12,16,12]
+      "आधार कार्ड" fs:14 fw:600
+      2 image slots 148×80 r:10 gap:8
+-->
+<div class="bs-overlay" id="bs-customer" onclick="if(event.target===this)hideBs('bs-customer')">
+  <div class="bs-panel" id="bs-customer-panel" style="max-height:70vh">
+    <!-- Handle bar: 120×4, drag to dismiss -->
+    <div style="padding:12px 0 24px;display:flex;justify-content:center;cursor:grab" id="bs-customer-handle">
+      <div style="width:120px;height:4px;background:#D7D3E0;border-radius:4px"></div>
+    </div>
+    <!-- Title -->
+    <div style="padding:8px 16px 8px">
+      <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">कस्टमर डिटेल्स</p>
+    </div>
+    <!-- Content -->
+    <div style="padding:24px 16px 48px;display:flex;flex-direction:column;gap:16px">
+      <!-- Customer Info Card -->
+      <div style="border:1px solid #E8E4F0;border-radius:12px;padding:16px 12px;display:flex;flex-direction:column;gap:12px">
+        <!-- Name -->
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="mi" style="font-size:24px;color:#A7A1B2">person</span>
+          <span style="font-size:16px;font-weight:700;color:#161021">Himanshu Singh</span>
+        </div>
+        <!-- Address -->
+        <div style="display:flex;align-items:flex-start;gap:8px">
+          <span class="mi" style="font-size:24px;color:#A7A1B2">location_on</span>
+          <span style="font-size:14px;font-weight:400;color:#161021;line-height:20px">G 69, Mata mandir, 3rd street, Ghaziabad Uttar Pradesh</span>
+        </div>
+        <!-- Family Number -->
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="mi" style="font-size:24px;color:#A7A1B2">confirmation_number</span>
+          <span style="font-size:14px;font-weight:400;color:#161021">फैमिली नंबर : 98765 43210</span>
+        </div>
+      </div>
+      <!-- Aadhaar Card Section -->
+      <div style="border:1px solid #E8E4F0;border-radius:12px;padding:16px 12px;display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:14px;font-weight:600;color:#161021">आधार कार्ड</span>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;height:80px;border-radius:10px;background:#D9D9D9;overflow:hidden">
+            <img id="bs-aadhaar-front" style="width:100%;height:100%;object-fit:cover" alt="Front">
+          </div>
+          <div style="flex:1;height:80px;border-radius:10px;background:#D9D9D9;overflow:hidden">
+            <img id="bs-aadhaar-back" style="width:100%;height:100%;object-fit:cover" alt="Back">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S12: PAYMENT CHECKLIST (Figma 198:74631→75885) — 6-state animation ===== -->
+<div class="scr" id="s12">
+  <!-- Header 168dp: close + trailing + title -->
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px">
+    <div style="flex:1;display:flex;align-items:center">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    </div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <div style="padding:8px 16px 16px">
+    <p style="font-size:24px;font-weight:700;line-height:32px">Himanshu Singh जी से व्योम ऐप द्वारा पेमेंट करने को कहें</p>
+  </div>
+  <div class="bd" style="padding:0 16px">
+    <!-- Checklist card: #F1EDF7, r=16, padding [24,16,24,16] -->
+    <div style="background:var(--n100);border-radius:16px;padding:24px 16px;position:relative">
+      <!-- Vertical progress bars: 2px wide, between icons (not through them) -->
+      <!-- Bar 1: between step 1 bottom (48px) and step 2 top (56px) = 32px gap, but need to account for icon height -->
+      <div id="cl-bar1" style="position:absolute;left:27px;top:48px;width:2px;height:32px;background:#008043"></div>
+      <div id="cl-bar2" style="position:absolute;left:27px;top:104px;width:2px;height:32px;background:#D7D3E0"></div>
+      <!-- Step 1: WiFi — always done -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px">
+        <svg width="24" height="24" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="10" fill="#008043"/><path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        <span style="font-size:16px;font-weight:400;line-height:24px">WiFi का नाम रख दिया</span>
+      </div>
+      <!-- Step 2: Aadhaar — starts as grey radio, becomes pink spinner (600ms), then green tick -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px">
+        <div id="cl-s2-icon" style="width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#A7A1B2" stroke-width="2"/></svg></div>
+        <span style="font-size:16px;font-weight:400;line-height:24px">आधार कार्ड और प्लग तैयार हैंं</span>
+      </div>
+      <!-- Step 3: Payment -->
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="cl-s3-icon" style="width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#A7A1B2" stroke-width="2"/></svg></div>
+        <span id="cl-s3-text" style="font-size:16px;font-weight:400;line-height:24px">पेमेंट हो गयी</span>
+      </div>
+    </div>
+    <!-- PayG info card: #F1E5FF, r=8, purple tag — hidden until payment state -->
+    <!-- PayG card: Figma 200:7436 — #F1E5FF, r=8, p=[16,12,16,12], gap=12 -->
+    <!-- Tag: #6D17CE, r=12, p=[4,12,4,12] -->
+    <!-- Content: stroke=#6D17CE (left accent), p=[0,0,0,8] -->
+    <div id="cl-payg" style="display:none;background:#F1E5FF;border-radius:8px;padding:16px 12px;margin-top:16px">
+      <div style="display:inline-flex;align-items:center;background:#6D17CE;border-radius:12px;padding:4px 12px;margin-bottom:12px">
+        <span style="font-size:14px;font-weight:600;color:#FAF9FC">PayG – सिस्टम जानकारी</span>
+      </div>
+      <div style="border-left:2px solid #6D17CE;padding-left:8px">
+        <p style="font-size:14px;font-weight:600;line-height:22px;margin-bottom:4px">₹300 सिक्योरिटी फीस होती है</p>
+        <p style="font-size:14px;font-weight:600;line-height:22px;margin-bottom:4px">इसके अलावा कोई भी पेमेंट की अनुमति नहीं है</p>
+        <p style="font-size:14px;font-weight:400;line-height:22px">कस्टमर अपनी ऐप में QR कोड से भी पेमेंट कर सकता है</p>
+      </div>
+    </div>
+  </div>
+  <div id="cl-cta-wrap" style="display:none;padding:0 16px 24px;flex-shrink:0"><button class="cta" onclick="showComplete()">आगे बढ़ें</button></div>
+</div>
+
+<!-- ===== S13: NET BOX POWER-UP TIMER (Figma 200:5440) ===== -->
+<!-- SPEC:200:5440
+Top app bar 360×136 | bg:#faf9fc | layout:V
+  Header: close #352D42 + "मदद" #D9008D fs:14 fw:600
+  Title: "व्योम नेट बॉक्स को स्विच ऑन करें" fs:24 fw:700 tc:#161021 lh:32
+Frame 328×328 | r:16 — router power-on image (netbox_power.webp)
+Timer area 328×60 | layout:V gap:8
+  Loader(20×20) pink spinner + "00:59" fs:24 fw:700 tc:#161021 lh:32 | layout:H gap:12
+  "इसमें 1-2 मिनट का समय लग सकता है" fs:14 fw:400 tc:#161021 lh:20
+-->
+<div class="scr" id="s13">
+  <audio id="s13-audio" preload="auto" src="img/power_on.mp3"></audio>
+  <!-- Header: close + मदद + title -->
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px">
+    <div style="flex:1;display:flex;align-items:center">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    </div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <!-- Title: fs:24 fw:700 tc:#161021 lh:32 -->
+  <div style="padding:8px 16px 16px">
+    <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">व्योम नेट बॉक्स को स्विच ऑन करें</p>
+  </div>
+  <div class="bd" style="padding:0 16px">
+    <!-- Router image: 328×328, r:16, includes Vector 99 mask -->
+    <div style="border-radius:16px;overflow:hidden;margin-bottom:24px">
+      <img src="img/netbox_power_masked.png" style="width:100%;display:block" alt="">
+    </div>
+    <!-- Timer area: layout:V gap:8, counterAxisAlignItems:CENTER -->
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+      <!-- Spinner + countdown: layout:H gap:12 -->
+      <div style="display:flex;align-items:center;gap:12px">
+        <!-- 20px pink arc spinner -->
+        <div style="width:20px;height:20px;border-radius:50%;border:3px solid transparent;border-top-color:var(--brand);border-right-color:var(--brand);animation:spin 0.6s linear infinite;flex-shrink:0"></div>
+        <!-- Timer: fs:24 fw:700 tc:#161021 lh:32 -->
+        <span id="s13-timer" style="font-size:24px;font-weight:700;line-height:32px;color:#161021">00:15</span>
+      </div>
+      <!-- Hint: fs:14 fw:400 tc:#161021 lh:20 -->
+      <p style="font-size:14px;font-weight:400;line-height:20px;color:#161021">इसमें 1-2 मिनट का समय लग सकता है</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== S14: NET BOX SWITCH-ON CONFIRM (Figma 198:68231) ===== -->
+<!-- SPEC:198:68231
+Header: close #352D42 + "मदद" #D9008D fs:14 fw:600
+Title: "व्योम नेट बॉक्स को स्विच ऑन करें" fs:24 fw:700 tc:#161021 lh:32
+Image: 328×328 r:16 — netbox_power.webp
+Checkbox: 24×24 checkbox-tick + "नेट बॉक्स ऑन कर दिया है" fs:16 fw:700 tc:#161021 lh:24 gap:12
+-->
+<div class="scr" id="s14">
+  <!-- Header: close + मदद -->
+  <div style="height:56px;display:flex;align-items:center;padding:0 4px">
+    <div style="flex:1;display:flex;align-items:center">
+      <button style="background:none;border:none;cursor:pointer;display:flex;padding:12px" onclick="confirmExit()"><span class="mi" style="font-size:24px;color:#352D42">close</span></button>
+    </div>
+    <div style="padding:12px"><span style="font-size:14px;font-weight:600;color:var(--brand);cursor:pointer">मदद</span></div>
+  </div>
+  <!-- Title: fs:24 fw:700 tc:#161021 lh:32 -->
+  <div style="padding:8px 16px 16px">
+    <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">व्योम नेट बॉक्स को स्विच ऑन करें</p>
+  </div>
+  <div class="bd" style="padding:0 16px" onclick="shakeCheckbox('s14-cb-row')">
+    <!-- Router image: 328×328 r:16, with Vector 99 mask -->
+    <div style="border-radius:16px;overflow:hidden;margin-bottom:24px">
+      <img src="img/netbox_power_masked.png" style="width:100%;display:block" alt="">
+    </div>
+    <!-- Checkbox: gap:12, checkbox 24×24 + text fs:16 fw:700 -->
+    <div id="s14-cb-row" style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="event.stopPropagation();var c=this.querySelector('.cb');if(!c.classList.contains('on')){c.classList.add('on');setTimeout(function(){go('s11')},600)}">
+      <div class="cb"></div>
+      <p style="font-size:16px;font-weight:700;line-height:24px;color:#161021">नेट बॉक्स ऑन कर दिया है</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ISP BOTTOM SHEET (Figma 224:17502) ===== -->
+<!-- SPEC:224:17502
+bottom sheet 360×324 | layout:V cross:CENTER
+  header 360×88:
+    slider 120×4 bg:#D7D3E0 r:4 centered
+    heading "ISP अकाउंट कैसे बनाना चाहते हैं?" fs:24 fw:700 tc:#161021
+  content 360×236 p:[24,16,48,16]:
+    2 cards 156×164 each, gap:16
+    Card: stroke:#E8E4F0/1px r:16 p:[32,16,32,16] cross:CENTER
+      icon_2layer 48×48 (circle #FFE5F6 + icon #D9008D)
+      text fs:16 fw:700 tc:#161021
+-->
+<div class="ov" id="ov-isp-sheet" style="align-items:flex-end">
+  <div style="width:100%;background:#FAF9FC;border-radius:24px 24px 0 0;animation:slideUp 0.3s ease;max-width:420px">
+    <!-- Drag handle -->
+    <div style="padding:12px 0 24px;display:flex;justify-content:center" onclick="hideOv('ov-isp-sheet')">
+      <div style="width:120px;height:4px;background:#D7D3E0;border-radius:4px"></div>
+    </div>
+    <!-- Heading -->
+    <div style="padding:0 16px 8px">
+      <p style="font-size:24px;font-weight:700;line-height:32px;color:#161021">ISP अकाउंट कैसे बनाना चाहते हैं?</p>
+    </div>
+    <!-- Cards -->
+    <div style="padding:24px 16px 48px;display:flex;gap:16px">
+      <!-- Card 1: खुद से, पोर्टल पर -->
+      <div id="isp-card-1" style="flex:1;background:#FAF9FC;border:1px solid #E8E4F0;border-radius:16px;padding:32px 16px;display:flex;flex-direction:column;align-items:center;gap:24px;cursor:pointer;transition:background 0.15s,border-color 0.15s" onclick="selectIspCard(this,'portal')">
+        <img src="img/ic_phone_portal.svg" style="width:48px;height:48px" alt="">
+        <span style="font-size:16px;font-weight:700;color:#161021;text-align:center">खुद से, पोर्टल पर</span>
+      </div>
+      <!-- Card 2: ऑफिस भेजकर -->
+      <div id="isp-card-2" style="flex:1;background:#FAF9FC;border:1px solid #E8E4F0;border-radius:16px;padding:32px 16px;display:flex;flex-direction:column;align-items:center;gap:24px;cursor:pointer;transition:background 0.15s,border-color 0.15s" onclick="selectIspCard(this,'office')">
+        <img src="img/ic_office_send.svg" style="width:48px;height:48px" alt="">
+        <span style="font-size:16px;font-weight:700;color:#161021;text-align:center">ऑफिस भेजकर</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== COMPLETION OVERLAY ===== -->
+<div class="ov" id="ov-complete">
+  <div class="fi" style="background:var(--card);border-radius:24px;padding:32px 24px;width:calc(100% - 48px);max-width:312px;text-align:center;box-shadow:var(--sh2)">
+    <div style="width:96px;height:96px;border-radius:50%;background:#E8F5E9;display:flex;align-items:center;justify-content:center;margin:0 auto 24px">
+      <span class="mi" style="font-size:48px;color:var(--pos)">check_circle</span>
+    </div>
+    <p style="font-size:24px;font-weight:700;line-height:32px;margin-bottom:16px">सेटअप पूरा हो गया!</p>
+    <p style="font-size:16px;color:var(--sec);margin-bottom:32px">Himanshu Singh जी का नेट बॉक्स सफलतापूर्वक सेटअप हो गया है</p>
+    <button style="width:100%;height:48px;border-radius:16px;background:var(--brand);color:#faf9fc;font-family:inherit;font-size:16px;font-weight:700;border:none;cursor:pointer" onclick="hideOv('ov-complete');localStorage.removeItem('wiom_resume_screen');localStorage.removeItem('wiom_payg_accepted');resumeScreen=null;go('s1')">होम पर जायें</button>
+  </div>
+</div>
+
+<!-- ===== EXIT SETUP DIALOG (Figma 215:15949) ===== -->
+<div class="ov" id="ov-exit">
+  <div class="fi" style="background:var(--card);border-radius:24px;padding:32px 24px;width:calc(100% - 48px);max-width:312px;box-shadow:var(--sh2)">
+    <!-- Warning graphic: 96×96, #FFE6CC bg, warning icon #FF8000 -->
+    <div style="width:96px;height:96px;border-radius:50%;background:#FFE6CC;display:flex;align-items:center;justify-content:center;margin-bottom:24px">
+      <span class="mi" style="font-size:48px;color:#FF8000">warning</span>
+    </div>
+    <p style="font-size:24px;font-weight:700;line-height:32px;margin-bottom:12px">सेटअप पर काम जारी है!</p>
+    <p style="font-size:16px;font-weight:400;line-height:24px;margin-bottom:48px">क्या आप अभी भी इसे रोकना चाहते हैं?</p>
+    <!-- Primary: stay in flow -->
+    <button style="width:100%;height:48px;border-radius:16px;background:var(--brand);color:#faf9fc;font-family:inherit;font-size:16px;font-weight:700;border:none;cursor:pointer;margin-bottom:12px" onclick="hideOv('ov-exit')">नहीं</button>
+    <!-- Secondary: exit to task list -->
+    <button style="width:100%;height:48px;border-radius:16px;background:var(--brand-light);color:var(--brand);font-family:inherit;font-size:16px;font-weight:700;border:none;cursor:pointer" onclick="exitSetup()">हाँ, सेटअप रोकें</button>
+  </div>
+</div>
+
+<script>
+// Camera stream reference
+var camStream=null;
+var captureCanvas=document.createElement('canvas');
+
+function startCam(videoId, facing){
+  stopCam();
+  var video=document.getElementById(videoId);
+  if(!video){console.log('No video element:',videoId);return}
+  // Try exact facingMode first, fallback to any camera
+  var constraints={video:{facingMode:{ideal:facing}},audio:false};
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(function(stream){
+      camStream=stream;
+      video.srcObject=stream;
+      video.play().catch(function(e){console.log('play error:',e)});
+    })
+    .catch(function(err){
+      console.log('Camera error with ideal '+facing+':',err);
+      // Fallback: try without facingMode constraint
+      navigator.mediaDevices.getUserMedia({video:true,audio:false})
+        .then(function(stream){
+          camStream=stream;
+          video.srcObject=stream;
+          video.play().catch(function(e){});
+        })
+        .catch(function(err2){console.log('Camera fallback error:',err2)});
+    });
+}
+
+function stopCam(){
+  if(camStream){
+    camStream.getTracks().forEach(function(t){t.stop()});
+    camStream=null;
+  }
+}
+
+function snapPhoto(videoId){
+  var video=document.getElementById(videoId);
+  if(!video||!video.videoWidth)return null;
+  captureCanvas.width=video.videoWidth;
+  captureCanvas.height=video.videoHeight;
+  var ctx=captureCanvas.getContext('2d');
+  ctx.drawImage(video,0,0);
+  return captureCanvas.toDataURL('image/jpeg',0.85);
+}
+
+// Shake animation — guides user to tap the checkbox
+function shakeCheckbox(id){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.style.animation='shake 0.5s ease';
+  setTimeout(function(){el.style.animation=''},600);
+}
+
+// Track current screen for resume — persists across app kills
+var currentScreen='s1';
+// APK version — bump this on each new APK push to force fresh start
+var APK_VERSION='v29';
+(function(){
+  var lastVer=localStorage.getItem('wiom_apk_version');
+  if(lastVer!==APK_VERSION){
+    // New APK installed — clear all flow state
+    localStorage.removeItem('wiom_resume_screen');
+    localStorage.removeItem('wiom_payg_accepted');
+    localStorage.setItem('wiom_apk_version',APK_VERSION);
+  }
+})();
+var resumeScreen=localStorage.getItem('wiom_resume_screen')||null;
+
+// On app launch, ALWAYS show s1 (task list) — never auto-navigate to a flow screen
+(function(){
+  document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});
+  var s1=document.getElementById('s1');
+  if(s1){s1.classList.add('on')}
+  currentScreen='s1';
+})();
+
+// Navigation — saves progress to localStorage for app-kill resume (flow screens only)
+function go(id){
+  document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on')});
+  var t=document.getElementById(id);
+  if(t){t.classList.add('on')}
+  currentScreen=id;
+  // Persist flow progress for resume after app kill (only flow screens, not s1/s2)
+  if(id!=='s1'&&id!=='s2'){localStorage.setItem('wiom_resume_screen',id)}
+  // Start cameras when entering camera screens
+  if(id==='s5'){startCam('cam-selfie','user')}
+  if(id==='s7'){startCam('cam-aadhaar','environment')}
+  if(id==='s18'){startCam('cam-netbox','environment')}
+  if(id==='s21'){startCam('cam-threepin','environment')}
+  if(id==='s24'){startCam('cam-wiring','environment')}
+  // Hide speed bottom sheet when leaving s29
+  if(id!=='s29'){var bsSpeed=document.getElementById('bs-speed');if(bsSpeed)bsSpeed.classList.remove('on')}
+  // Stop camera when leaving camera screens
+  if(id!=='s5'&&id!=='s7'&&id!=='s18'&&id!=='s21'&&id!=='s24'){stopCam()}
+  // Auto-advance loading screen
+  if(id==='s9'){setTimeout(function(){go('s10')},2000)}
+  // Populate Aadhaar images on customer details screen
+  if(id==='s11'){
+    if(aadhaarState.frontData){document.getElementById('s11-aadhaar-front').src=aadhaarState.frontData}
+    if(aadhaarState.backData){document.getElementById('s11-aadhaar-back').src=aadhaarState.backData}
+  }
+  // PayG acceptance audio (s3)
+  if(id==='s3'){startPaygAcceptanceAudio()}
+  // PayG system info audio (s8c)
+  if(id==='s8c'){startPaygAudio()}
+  // Run checklist animation
+  if(id==='s12'){runChecklist()}
+  // Start power-up countdown
+  if(id==='s13'){startPowerUpTimer()}
+  // ISP recharge audio (s15)
+  if(id==='s15'){startIspAudio()}
+  // Net Box placement check (s17)
+  if(id==='s17'){startPlacementCheck()}
+  // 3-pin plug info + audio (s20)
+  if(id==='s20'){startThreepinCheck()}
+  // Wiring check + audio (s23)
+  if(id==='s23'){startWiringCheck()}
+  // Loading → auto-transition to success (s26→s27)
+  if(id==='s26'){setTimeout(function(){go('s27')},3000)}
+  // Optical power check (s28)
+  if(id==='s28'){startOpticalPowerCheck()}
+  // Speed test (s29)
+  if(id==='s29'){startSpeedTest()}
+  // Recharge info audio (s30)
+  if(id==='s30'){startRechargeAudio()}
+  // Reset OTP on entering s32
+  if(id==='s32'){happyCode='';updateHappyCodeDisplay()}
+}
+
+// Start fresh — clear saved progress and go to task detail
+function startFreshFlow(){
+  localStorage.removeItem('wiom_resume_screen');
+  resumeScreen=null;
+  go('s2');
+}
+
+// Resume flow from where technician left off, or start fresh
+function resumeFlow(){
+  if(resumeScreen){
+    // Update step counter on s2 before navigating
+    var steps=getStepCount(resumeScreen);
+    var ring=document.querySelector('#s2 .step-ring .progress');
+    var ringText=document.querySelector('#s2 .step-ring span');
+    if(ring && ringText){
+      var circumference=94.25;
+      var offset=circumference - (circumference * steps / 8);
+      ring.setAttribute('stroke-dashoffset', offset.toFixed(1));
+      ringText.textContent=steps+'/8';
+    }
+    // Skip s3 if PayG already accepted
+    var target=resumeScreen;
+    if(target==='s3'&&localStorage.getItem('wiom_payg_accepted')==='1'){target='s4'}
+    go(target);
+  } else {
+    // Fresh start — skip s3 if already accepted
+    if(localStorage.getItem('wiom_payg_accepted')==='1'){
+      go('s4');
+    } else {
+      go('s3');
+    }
+  }
+}
+
+// Show exit confirmation dialog
+function confirmExit(){
+  showOv('ov-exit');
+}
+
+// Map screen IDs to step numbers (out of 8)
+function getStepCount(screenId){
+  var map = {
+    's3':1, 's4':1, 's5':2, 's6':2, 's7':3, 's8':3,
+    's8c':4, 's9':4, 's10':5, 's11':5, 's15':6, 's16':6, 's17':7, 's18':7, 's19':7, 's20':7, 's21':7, 's22':7, 's23':7, 's24':7, 's25':7, 's26':8, 's27':8, 's28':8, 's29':8, 's30':8, 's31':8, 's32':8, 's33':8, 's12':8, 's13':8, 's14':8
+  };
+  return map[screenId] || 0;
+}
+
+// Exit setup: save current screen, go to task detail (s2) with updated step counter
+function exitSetup(){
+  hideOv('ov-exit');
+  resumeScreen=currentScreen;
+  localStorage.setItem('wiom_resume_screen',currentScreen);
+  var steps=getStepCount(currentScreen);
+  // Update the step ring on card 1 in s2
+  var ring=document.querySelector('#s2 .step-ring .progress');
+  var ringText=document.querySelector('#s2 .step-ring span');
+  if(ring && ringText){
+    var circumference=94.25;
+    var offset=circumference - (circumference * steps / 8);
+    ring.setAttribute('stroke-dashoffset', offset.toFixed(1));
+    ringText.textContent=steps+'/8';
+  }
+  go('s2');
+}
+function showOv(id){var e=document.getElementById(id);if(e)e.classList.add('on')}
+function hideOv(id){var e=document.getElementById(id);if(e)e.classList.remove('on')}
+
+// Bottom Sheet — show/hide + drag-to-dismiss
+function showBs(id){
+  var bs=document.getElementById(id);
+  if(!bs)return;
+  // Populate Aadhaar images if available
+  if(id==='bs-customer'){
+    if(aadhaarState.frontData){document.getElementById('bs-aadhaar-front').src=aadhaarState.frontData}
+    if(aadhaarState.backData){document.getElementById('bs-aadhaar-back').src=aadhaarState.backData}
+  }
+  bs.classList.add('on');
+  var panel=bs.querySelector('.bs-panel');
+  panel.style.transform='translateY(0)';
+}
+function hideBs(id){
+  var bs=document.getElementById(id);
+  if(!bs)return;
+  var panel=bs.querySelector('.bs-panel');
+  panel.style.transform='translateY(100%)';
+  setTimeout(function(){bs.classList.remove('on');panel.style.transform=''},300);
+}
+// Drag-to-dismiss on bottom sheet handle
+(function(){
+  var handle=document.getElementById('bs-customer-handle');
+  var panel=document.getElementById('bs-customer-panel');
+  if(!handle||!panel)return;
+  var startY=0,currentY=0,dragging=false;
+  handle.addEventListener('touchstart',function(e){
+    startY=e.touches[0].clientY;currentY=0;dragging=true;
+    panel.style.transition='none';
+  });
+  handle.addEventListener('touchmove',function(e){
+    if(!dragging)return;
+    currentY=e.touches[0].clientY-startY;
+    if(currentY<0)currentY=0;
+    panel.style.transform='translateY('+currentY+'px)';
+  });
+  handle.addEventListener('touchend',function(){
+    if(!dragging)return;
+    dragging=false;
+    panel.style.transition='transform 0.3s ease';
+    if(currentY>100){
+      hideBs('bs-customer');
+    } else {
+      panel.style.transform='translateY(0)';
+    }
+  });
+})()
+
+// PayG acceptance audio — play 10s, then show checkbox
+var s3ProgressInterval=null;
+function startPaygAcceptanceAudio(){
+  var audio=document.getElementById('s3-audio');
+  var progress=document.getElementById('s3-progress');
+  var barWrap=document.getElementById('s3-bar-wrap');
+  var agree=document.getElementById('s3-agree');
+  // Reset checkbox to unchecked state
+  var cb=document.getElementById('payg-cb');
+  if(cb){cb.classList.remove('on')}
+  // Reset UI
+  agree.style.display='none';
+  barWrap.style.display='block';
+  progress.style.width='0%';
+  // Play audio
+  if(audio){audio.currentTime=0;audio.play().catch(function(e){});}
+  // Animate progress bar over 10s
+  var start=Date.now();
+  if(s3ProgressInterval)clearInterval(s3ProgressInterval);
+  s3ProgressInterval=setInterval(function(){
+    var elapsed=(Date.now()-start)/1000;
+    var pct=Math.min(100,(elapsed/10)*100);
+    progress.style.width=pct+'%';
+    if(pct>=100)clearInterval(s3ProgressInterval);
+  },200);
+  // After 10.25s: hide bar, show checkbox
+  setTimeout(function(){
+    if(s3ProgressInterval)clearInterval(s3ProgressInterval);
+    progress.style.width='100%';
+    barWrap.style.display='none';
+    agree.style.display='block';
+  },10250);
+}
+
+// PayG checkbox — fills and auto-transitions after 450ms
+function paygAgree(el){
+  var c=el.querySelector('.cb');
+  if(c.classList.contains('on')) return;
+  c.classList.add('on');
+  localStorage.setItem('wiom_payg_accepted','1');
+  setTimeout(function(){ go('s4'); },450);
+}
+
+// Capture selfie from front camera
+function captureSelfie(){
+  var dataUrl=snapPhoto('cam-selfie');
+  if(dataUrl){
+    document.getElementById('selfie-preview').src=dataUrl;
+  }
+  stopCam();
+  go('s6');
+}
+
+// Call button — open phone dialer, then reveal post-call state on return
+function simulateCall(){
+  // Open dialer with Wiom masked number
+  window.location.href='tel:+919876543210';
+  // When user returns, reveal post-call state after brief delay
+  setTimeout(function(){
+    document.getElementById('s4-family').style.display='flex';
+    document.getElementById('s4-isp-card').style.display='block';
+  },2000);
+}
+
+// Aadhaar flow — 3 states: front prompt → front captured + back prompt → both captured
+var aadhaarState={front:false,back:false,frontData:null,backData:null};
+
+function openAadhaarCam(){
+  go('s7');
+}
+
+function retakeFront(){
+  aadhaarState.front=false;
+  aadhaarState.frontData=null;
+  // Reset to state 1
+  document.getElementById('s8-front-prompt').style.display='';
+  document.getElementById('s8-review').style.display='none';
+  document.getElementById('s8-both').style.display='none';
+  document.getElementById('s8-cta').style.display='none';
+  document.querySelector('#s8 [style*="padding:8px 16px"]').style.display='';
+}
+
+function retakeBack(){
+  aadhaarState.back=false;
+  aadhaarState.backData=null;
+  // Go back to state 2 (front captured + back prompt)
+  document.getElementById('s8-both').style.display='none';
+  document.getElementById('s8-cta').style.display='none';
+  document.getElementById('s8-review').style.display='block';
+  document.querySelector('#s8 [style*="padding:8px 16px"]').style.display='';
+}
+
+function captureAadhaar(){
+  var dataUrl=snapPhoto('cam-aadhaar');
+  stopCam();
+  if(!aadhaarState.front){
+    aadhaarState.front=true;
+    aadhaarState.frontData=dataUrl;
+    // State 2: front captured + back prompt
+    document.getElementById('s8-front-prompt').style.display='none';
+    document.getElementById('s8-review').style.display='block';
+    if(dataUrl){document.getElementById('aadhaar-front-img').src=dataUrl}
+    go('s8');
+  } else {
+    aadhaarState.back=true;
+    aadhaarState.backData=dataUrl;
+    // State 3: both captured — hide title, show both photos + CTA
+    document.getElementById('s8-review').style.display='none';
+    document.getElementById('s8-both').style.display='block';
+    document.getElementById('s8-cta').style.display='block';
+    document.querySelector('#s8 [style*="padding:8px 16px"]').style.display='none';
+    if(aadhaarState.frontData){document.getElementById('aadhaar-front-final').src=aadhaarState.frontData}
+    if(dataUrl){document.getElementById('aadhaar-back-final').src=dataUrl}
+    go('s8');
+  }
+}
+
+// ISP bottom sheet — card selection micro interaction
+function selectIspCard(card, action){
+  // Reset both cards
+  document.getElementById('isp-card-1').style.background='#FAF9FC';
+  document.getElementById('isp-card-1').style.borderColor='#E8E4F0';
+  document.getElementById('isp-card-2').style.background='#FAF9FC';
+  document.getElementById('isp-card-2').style.borderColor='#E8E4F0';
+  // Highlight selected card: bg:#FFCCED, border:#D9008D
+  card.style.background='#FFCCED';
+  card.style.borderColor='#D9008D';
+  // After 400ms micro interaction, trigger action
+  setTimeout(function(){
+    hideOv('ov-isp-sheet');
+    // Reset card styles for next time
+    card.style.background='#FAF9FC';
+    card.style.borderColor='#E8E4F0';
+    if(action==='portal'){
+      // Open ISP portal in device Chrome (external), then show ISP form on return
+      if(typeof Android!=='undefined'&&Android.openExternal){
+        Android.openExternal('https://crmh.myion.in/Login.aspx');
+      } else {
+        window.open('https://crmh.myion.in/Login.aspx','_blank');
+      }
+      // When user returns, show ISP details form
+      setTimeout(function(){ go('s16'); },1000);
+    } else if(action==='office'){
+      // Office route — open WhatsApp to send details, then show ISP form on return
+      window.open('https://wa.me/?text=ISP%20details%20needed','_blank');
+      setTimeout(function(){ go('s16'); },1000);
+    }
+  },400);
+}
+
+// ISP type radio selection
+function selectIspType(selected){
+  // Reset all radios
+  document.querySelectorAll('#s16 .isp-radio').forEach(function(r){
+    r.classList.remove('selected');
+    r.querySelector('.radio-dot').setAttribute('fill','none');
+    r.querySelector('circle').setAttribute('stroke','#352D42');
+  });
+  // Select clicked radio — pink bg + brand stroke + brand dot
+  selected.classList.add('selected');
+  selected.querySelector('.radio-dot').setAttribute('fill','#D9008D');
+  selected.querySelector('circle').setAttribute('stroke','#D9008D');
+  // Toggle form containers
+  var type=selected.getAttribute('data-isp');
+  document.getElementById('isp-form-pppoe').style.display=type==='pppoe'?'flex':'none';
+  document.getElementById('isp-form-static').style.display=type==='static'?'flex':'none';
+  document.getElementById('isp-form-dhcp').style.display=type==='dhcp'?'flex':'none';
+}
+
+// ─── PPPoE Field Interactions ───
+
+// Username: show inline submit when text entered, Enter key triggers submit
+function onPppoeUserInput(){
+  var val=document.getElementById('isp-pppoe-user').value.trim();
+  var submit=document.getElementById('pppoe-user-submit');
+  var check=document.getElementById('pppoe-user-check');
+  if(check.style.display==='inline') return; // already validated
+  submit.style.display=val.length>0?'inline':'none';
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var userInput=document.getElementById('isp-pppoe-user');
+  if(userInput) userInput.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();validatePppoeUser()}
+  });
+  var netboxInput=document.getElementById('isp-pppoe-netbox');
+  if(netboxInput) netboxInput.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){e.preventDefault();validatePppoeNetbox()}
+  });
+  // DS Input-Field state management: toggle .active/.filled on .isp-field parent
+  document.querySelectorAll('.isp-field input').forEach(function(inp){
+    var field=inp.closest('.isp-field');
+    if(!field) return;
+    inp.addEventListener('focus',function(){
+      field.classList.add('active');
+    });
+    inp.addEventListener('blur',function(){
+      field.classList.remove('active');
+      if(inp.value.trim().length>0){
+        field.classList.add('filled');
+      } else {
+        field.classList.remove('filled');
+      }
+    });
+    inp.addEventListener('input',function(){
+      if(inp.value.trim().length>0){
+        field.classList.add('filled');
+      } else {
+        field.classList.remove('filled');
+      }
+    });
+  });
+});
+
+// Username validation: submit → spinner (1.5s) → green check → reveal Net Box ID
+function validatePppoeUser(){
+  var val=document.getElementById('isp-pppoe-user').value.trim();
+  if(!val) return;
+  document.getElementById('pppoe-user-submit').style.display='none';
+  document.getElementById('pppoe-user-spinner').style.display='inline-block';
+  setTimeout(function(){
+    document.getElementById('pppoe-user-spinner').style.display='none';
+    document.getElementById('pppoe-user-check').style.display='inline';
+    document.getElementById('pppoe-user-wrap').closest('.isp-field').classList.add('validated');
+    document.getElementById('isp-pppoe-user').readOnly=true;
+    // Reveal VLAN dropdown field
+    document.getElementById('pppoe-vlan-field').style.display='flex';
+    document.getElementById('pppoe-vlan-field').scrollIntoView({behavior:'smooth',block:'center'});
+    checkIspFormComplete();
+  },1500);
+}
+
+// Password: show eye toggle after input, Enter blurs field
+function onPppoePassInput(){
+  var val=document.getElementById('isp-pppoe-pass').value;
+  document.getElementById('pppoe-pass-eye').style.display=val.length>0?'inline':'none';
+}
+function togglePassVisibility(){
+  var inp=document.getElementById('isp-pppoe-pass');
+  var eye=document.getElementById('pppoe-pass-eye');
+  if(inp.type==='password'){
+    inp.type='text';
+    eye.textContent='visibility';
+  } else {
+    inp.type='password';
+    eye.textContent='visibility_off';
+  }
+}
+
+// Net Box ID: show inline submit → spinner → green check → reveal VLAN
+function onPppoeNetboxInput(){
+  var val=document.getElementById('isp-pppoe-netbox').value.trim();
+  var submit=document.getElementById('pppoe-netbox-submit');
+  var check=document.getElementById('pppoe-netbox-check');
+  if(check.style.display==='inline') return;
+  submit.style.display=val.length>0?'inline':'none';
+}
+function validatePppoeNetbox(){
+  var val=document.getElementById('isp-pppoe-netbox').value.trim();
+  if(!val) return;
+  document.getElementById('pppoe-netbox-submit').style.display='none';
+  document.getElementById('pppoe-netbox-spinner').style.display='inline-block';
+  setTimeout(function(){
+    document.getElementById('pppoe-netbox-spinner').style.display='none';
+    document.getElementById('pppoe-netbox-check').style.display='inline';
+    document.getElementById('pppoe-netbox-wrap').closest('.isp-field').classList.add('validated');
+    document.getElementById('isp-pppoe-netbox').readOnly=true;
+    checkIspFormComplete();
+  },1500);
+}
+
+// VLAN dropdown: toggle open/close
+function toggleVlanDropdown(){
+  var dd=document.getElementById('pppoe-vlan-dropdown');
+  var chev=document.getElementById('pppoe-vlan-chevron');
+  if(dd.style.display==='none'){
+    dd.style.display='block';
+    chev.style.transform='rotate(180deg)';
+  } else {
+    dd.style.display='none';
+    chev.style.transform='rotate(0deg)';
+  }
+}
+// VLAN selection: update value, close dropdown, conditionally show VLAN ID
+function selectVlan(value){
+  document.getElementById('pppoe-vlan-value').textContent=value;
+  // Update selected highlight
+  document.querySelectorAll('.vlan-opt').forEach(function(o){
+    o.classList.toggle('selected',o.textContent.trim()===value);
+  });
+  toggleVlanDropdown();
+  // Show/hide VLAN ID field (only for TAG)
+  var vlanIdField=document.getElementById('pppoe-vlanid-field');
+  if(value==='TAG'){
+    vlanIdField.style.display='flex';
+    vlanIdField.scrollIntoView({behavior:'smooth',block:'center'});
+  } else {
+    vlanIdField.style.display='none';
+  }
+  // Reveal Net Box ID field after VLAN selection
+  var netboxField=document.getElementById('pppoe-netbox-field');
+  if(netboxField.style.display==='none'){
+    netboxField.style.display='flex';
+    netboxField.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  checkIspFormComplete();
+}
+
+// Save Aadhaar images to device storage via Android bridge
+function saveAadhaarImages(){
+  var customerName='Himanshu';
+  if(!aadhaarState.frontData && !aadhaarState.backData){
+    alert('कोई आधार फोटो नहीं है');
+    return;
+  }
+  var saved=0;
+  if(aadhaarState.frontData){
+    if(typeof Android!=='undefined'&&Android.saveImage){
+      Android.saveImage(aadhaarState.frontData,customerName+' Aadhar Front');
+      saved++;
+    }
+  }
+  if(aadhaarState.backData){
+    if(typeof Android!=='undefined'&&Android.saveImage){
+      Android.saveImage(aadhaarState.backData,customerName+' Aadhar Back');
+      saved++;
+    }
+  }
+  if(saved===0&&typeof Android==='undefined'){
+    // Fallback for browser preview — download via anchor
+    if(aadhaarState.frontData){downloadDataUrl(aadhaarState.frontData,customerName+' Aadhar Front.jpg');}
+    if(aadhaarState.backData){downloadDataUrl(aadhaarState.backData,customerName+' Aadhar Back.jpg');}
+  }
+}
+function downloadDataUrl(dataUrl,filename){
+  var a=document.createElement('a');
+  a.href=dataUrl;a.download=filename;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+
+// Checklist 6-state animation per Figma 198:74631→75885
+var tickSvg='<svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#008043"/><path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+// 18px pink arc spinner per Figma — 3px stroke, brand pink, spins
+var spinnerHtml='<div style="width:18px;height:18px;border-radius:50%;border:3px solid transparent;border-top-color:var(--brand);border-right-color:var(--brand);animation:spin 0.6s linear infinite"></div>';
+
+function runChecklist(){
+  var s2=document.getElementById('cl-s2-icon');
+  var s3=document.getElementById('cl-s3-icon');
+  var s3t=document.getElementById('cl-s3-text');
+  var bar2=document.getElementById('cl-bar2');
+  var loader=document.getElementById('cl-loader');
+  var payg=document.getElementById('cl-payg');
+  var cta=document.getElementById('cl-cta-wrap');
+
+  // State 1: initial (WiFi done, others pending) — already rendered
+  // State 2 at 1s: step 2 shows pink spinner (replaces grey radio)
+  setTimeout(function(){
+    s2.innerHTML=spinnerHtml;
+  },1000);
+  // State 3 at 1.6s (600ms spinner): step 2 done → green tick
+  setTimeout(function(){
+    s2.innerHTML=tickSvg;
+    bar2.style.background='#008043';
+  },1600);
+  // State 4 at 2.2s: step 3 shows pink spinner
+  setTimeout(function(){
+    s3.innerHTML=spinnerHtml;
+  },2200);
+  // State 5 at 3s: step 3 text changes + PayG card appears (hold 1200ms)
+  setTimeout(function(){
+    s3t.textContent='पेमेंट करें';
+    payg.style.display='block';
+  },3000);
+  // State 6 at 4.2s (1200ms hold): all done, show briefly then auto-transition
+  setTimeout(function(){
+    s3.innerHTML=tickSvg;
+    s3t.textContent='पेमेंट हो गयी';
+    payg.style.display='none';
+  },4200);
+  // Auto-transition to power-on timer after 1200ms of all-done state
+  setTimeout(function(){
+    go('s13');
+  },5400);
+}
+
+// PayG audio screen — play audio, animate progress bar, show CTA after 18.5s
+var paygProgressInterval=null;
+function startPaygAudio(){
+  var audio=document.getElementById('s8c-audio');
+  var progress=document.getElementById('s8c-progress');
+  var cta=document.getElementById('s8c-cta');
+  var barWrap=document.getElementById('s8c-bar-wrap');
+  // Reset
+  cta.style.display='none';
+  barWrap.style.display='block';
+  progress.style.width='0%';
+  // Play audio
+  if(audio){audio.currentTime=0;audio.play().catch(function(e){});}
+  // Animate progress bar over 17s (audio duration)
+  var start=Date.now();
+  if(paygProgressInterval)clearInterval(paygProgressInterval);
+  paygProgressInterval=setInterval(function(){
+    var elapsed=(Date.now()-start)/1000;
+    var pct=Math.min(100,(elapsed/17)*100);
+    progress.style.width=pct+'%';
+    if(pct>=100)clearInterval(paygProgressInterval);
+  },200);
+  // After 18.5s: hide bar, show CTA
+  setTimeout(function(){
+    if(paygProgressInterval)clearInterval(paygProgressInterval);
+    progress.style.width='100%';
+    barWrap.style.display='none';
+    cta.style.display='block';
+  },18500);
+}
+
+// ISP recharge education audio — play 9.2s audio, animate progress, auto-transition at 10.5s
+var ispProgressInterval=null;
+function startIspAudio(){
+  var audio=document.getElementById('s15-audio');
+  var progress=document.getElementById('s15-progress');
+  var cta=document.getElementById('s15-cta');
+  var barWrap=document.getElementById('s15-bar-wrap');
+  // Reset
+  cta.style.display='none';
+  barWrap.style.display='block';
+  progress.style.width='0%';
+  // Play audio
+  if(audio){audio.currentTime=0;audio.play().catch(function(e){});}
+  // Animate progress bar over 9.2s (audio duration)
+  var start=Date.now();
+  if(ispProgressInterval)clearInterval(ispProgressInterval);
+  ispProgressInterval=setInterval(function(){
+    var elapsed=(Date.now()-start)/1000;
+    var pct=Math.min(100,(elapsed/9.2)*100);
+    progress.style.width=pct+'%';
+    if(pct>=100)clearInterval(ispProgressInterval);
+  },200);
+  // After 10.5s: hide bar, show CTA
+  setTimeout(function(){
+    if(ispProgressInterval)clearInterval(ispProgressInterval);
+    progress.style.width='100%';
+    barWrap.style.display='none';
+    cta.style.display='block';
+  },10500);
+}
+
+function showComplete(){
+  go('s13');
+}
+
+// Countdown timer for Net Box power-up (s13)
+var timerInterval=null;
+function startPowerUpTimer(){
+  var seconds=15; // 15s for testing (production: 59)
+  var el=document.getElementById('s13-timer');
+  if(timerInterval)clearInterval(timerInterval);
+  el.textContent='00:'+seconds.toString().padStart(2,'0');
+  // Play IVR audio (8s)
+  var audio=document.getElementById('s13-audio');
+  if(audio){audio.currentTime=0;audio.play().catch(function(e){});}
+  timerInterval=setInterval(function(){
+    seconds--;
+    if(seconds<=0){
+      clearInterval(timerInterval);
+      timerInterval=null;
+      el.textContent='00:00';
+      go('s14');
+      return;
+    }
+    el.textContent='00:'+seconds.toString().padStart(2,'0');
+  },1000);
+}
+
+// ─── S16 CTA: show "नेट बॉक्स तैयार करें" when form is sufficiently filled ───
+function checkIspFormComplete(){
+  var cta=document.getElementById('s16-cta');
+  if(!cta) return;
+  // For PPPoE: username validated + password filled + netbox validated + VLAN selected
+  // VLAN ID only required if TAG
+  var userOk=document.getElementById('pppoe-user-check').style.display==='inline';
+  var passOk=document.getElementById('isp-pppoe-pass').value.length>0;
+  var netboxOk=document.getElementById('pppoe-netbox-check').style.display==='inline';
+  var vlanVal=document.getElementById('pppoe-vlan-value').textContent.trim();
+  var vlanIdOk=true;
+  if(vlanVal==='TAG'){
+    var vid=document.getElementById('isp-pppoe-vlanid').value.trim();
+    vlanIdOk=vid.length>0&&parseInt(vid)>=128&&parseInt(vid)<=1492;
+  }
+  if(userOk&&passOk&&netboxOk&&vlanIdOk){
+    cta.style.display='block';
+  } else {
+    cta.style.display='none';
+  }
+}
+// Hook into existing validation completion callbacks
+var origValidatePppoeUser=validatePppoeUser;
+var origSelectVlan=selectVlan;
+
+// Trigger CTA check when VLAN ID changes
+document.addEventListener('DOMContentLoaded',function(){
+  var vlanIdInput=document.getElementById('isp-pppoe-vlanid');
+  if(vlanIdInput){
+    vlanIdInput.addEventListener('input',function(){checkIspFormComplete()});
+  }
+  // Also check when password is typed
+  var passInput=document.getElementById('isp-pppoe-pass');
+  if(passInput){
+    passInput.addEventListener('input',function(){checkIspFormComplete()});
+  }
+});
+
+// Called when "नेट बॉक्स तैयार करें" CTA is tapped
+function onNetboxReady(){
+  // Show WiFi connection popup (Android-style dialog)
+  showOv('ov-wifi');
+}
+
+// ─── S17: Net Box Placement Check ───
+var s17TimerInterval=null;
+function startPlacementCheck(){
+  var seconds=59;
+  var timerEl=document.getElementById('s17-timer');
+  var timerState=document.getElementById('s17-timer-state');
+  var cbState=document.getElementById('s17-checkbox-state');
+  var cb=document.getElementById('s17-cb');
+  // Reset
+  timerState.style.display='flex';
+  cbState.style.display='none';
+  if(cb) cb.classList.remove('on');
+  timerEl.textContent='00:59';
+  // Play audio (10s)
+  var audio=document.getElementById('s17-audio');
+  if(audio){audio.currentTime=0;audio.play().catch(function(e){});}
+  // Auto-transition: after 12s (audio 10s + 2s buffer), switch to checkbox state
+  setTimeout(function(){
+    timerState.style.display='none';
+    cbState.style.display='block';
+  },12000);
+  // Countdown timer (visual only, runs alongside)
+  if(s17TimerInterval) clearInterval(s17TimerInterval);
+  s17TimerInterval=setInterval(function(){
+    seconds--;
+    if(seconds<=0){
+      clearInterval(s17TimerInterval);
+      s17TimerInterval=null;
+      timerEl.textContent='00:00';
+      return;
+    }
+    timerEl.textContent='00:'+seconds.toString().padStart(2,'0');
+  },1000);
+}
+
+function placementAgree(el){
+  var c=el.querySelector('.cb');
+  if(c.classList.contains('on')) return;
+  c.classList.add('on');
+  if(s17TimerInterval){clearInterval(s17TimerInterval);s17TimerInterval=null;}
+  setTimeout(function(){ go('s18'); },450);
+}
+
+// ─── S18: Net Box Photo Capture ───
+var netboxPhotoData=null;
+function captureNetboxPhoto(){
+  netboxPhotoData=snapPhoto('cam-netbox');
+  stopCam();
+  if(netboxPhotoData){
+    document.getElementById('netbox-photo-preview').src=netboxPhotoData;
+  }
+  go('s19');
+}
+function retakeNetboxPhoto(){
+  netboxPhotoData=null;
+  go('s18');
+}
+
+// ─── S20: 3-Pin Plug Info + Audio ───
+var s20TimerInterval=null;
+function startThreepinCheck(){
+  var seconds=59;
+  var timerEl=document.getElementById('s20-timer');
+  var timerState=document.getElementById('s20-timer-state');
+  var cbState=document.getElementById('s20-checkbox-state');
+  var cb=document.getElementById('s20-cb');
+  // Reset
+  timerState.style.display='flex';
+  cbState.style.display='none';
+  if(cb) cb.classList.remove('on');
+  timerEl.textContent='00:59';
+  // Play audio (2s)
+  var audio=document.getElementById('s20-audio');
+  if(audio){audio.currentTime=0;audio.play().catch(function(e){});}
+  // After 4.5s: switch to checkbox state
+  setTimeout(function(){
+    timerState.style.display='none';
+    cbState.style.display='block';
+  },4500);
+  // Countdown timer (visual)
+  if(s20TimerInterval) clearInterval(s20TimerInterval);
+  s20TimerInterval=setInterval(function(){
+    seconds--;
+    if(seconds<=0){clearInterval(s20TimerInterval);s20TimerInterval=null;timerEl.textContent='00:00';return;}
+    timerEl.textContent='00:'+seconds.toString().padStart(2,'0');
+  },1000);
+}
+
+function threepinAgree(el){
+  var c=el.querySelector('.cb');
+  if(c.classList.contains('on')) return;
+  c.classList.add('on');
+  if(s20TimerInterval){clearInterval(s20TimerInterval);s20TimerInterval=null;}
+  setTimeout(function(){ go('s21'); },450);
+}
+
+// ─── S21/S22: 3-Pin Photo Capture + Review ───
+var threepinPhotoData=null;
+function captureThreepinPhoto(){
+  threepinPhotoData=snapPhoto('cam-threepin');
+  stopCam();
+  if(threepinPhotoData){
+    document.getElementById('threepin-photo-preview').src=threepinPhotoData;
+  }
+  go('s22');
+}
+function retakeThreepinPhoto(){
+  threepinPhotoData=null;
+  go('s21');
+}
+
+// ─── S29: Speed Test ───
+var s29Anim=null;
+function startSpeedTest(){
+  var speedEl=document.getElementById('s29-speed');
+  var container=document.getElementById('s29-lottie');
+  speedEl.textContent='0 Mbps';
+  speedEl.style.color='#A7A1B2';
+  // Destroy previous instance
+  if(s29Anim){s29Anim.destroy();s29Anim=null;}
+  container.innerHTML='';
+  // Load Lottie animation — play once, no loop
+  s29Anim=lottie.loadAnimation({
+    container:container,
+    renderer:'svg',
+    loop:false,
+    autoplay:true,
+    path:'img/speedmeter.json'
+  });
+  // Sync speed text with Lottie progress
+  var totalFrames=0;
+  s29Anim.addEventListener('DOMLoaded',function(){
+    totalFrames=s29Anim.totalFrames||60;
+  });
+  s29Anim.addEventListener('enterFrame',function(e){
+    var pct=e.currentTime/(totalFrames||60);
+    var speed=Math.round(pct*89);
+    if(speed>89) speed=89;
+    speedEl.textContent=speed+' Mbps';
+    speedEl.style.color=speed>=80?'#008043':'#161021';
+  });
+  s29Anim.addEventListener('complete',function(){
+    speedEl.textContent='89 Mbps';
+    speedEl.style.color='#008043';
+    // Show bottom sheet after 1s
+    setTimeout(function(){ showBs('bs-speed'); },1000);
+  });
+}
+
+function selectSpeedCard(choice){
+  var yes=document.getElementById('speed-yes');
+  var no=document.getElementById('speed-no');
+  // Reset both
+  yes.style.background='#FAF9FC';
+  no.style.background='#FAF9FC';
+  // Highlight selected
+  if(choice==='yes') yes.style.background='#FFCCED';
+  else no.style.background='#FFCCED';
+  // After 400ms, navigate
+  setTimeout(function(){
+    hideBs('bs-speed');
+    yes.style.background='#FAF9FC';
+    no.style.background='#FAF9FC';
+    go('s30');
+  },400);
+}
+
+// ─── S30: Recharge Info Audio ───
+var s30ProgressInterval=null;
+function startRechargeAudio(){
+  var audio=document.getElementById('s30-audio');
+  var progress=document.getElementById('s30-progress');
+  var barWrap=document.getElementById('s30-bar-wrap');
+  var ctaWrap=document.getElementById('s30-cta-wrap');
+  // Reset
+  ctaWrap.style.display='none';
+  barWrap.style.display='block';
+  progress.style.width='0%';
+  // Play audio
+  if(audio){audio.currentTime=0;audio.play().catch(function(e){});}
+  // Animate progress over 10.3s
+  var start=Date.now();
+  if(s30ProgressInterval) clearInterval(s30ProgressInterval);
+  s30ProgressInterval=setInterval(function(){
+    var elapsed=(Date.now()-start)/1000;
+    var pct=Math.min(100,(elapsed/10.3)*100);
+    progress.style.width=pct+'%';
+    if(pct>=100) clearInterval(s30ProgressInterval);
+  },200);
+  // After 11s: show ghost CTA
+  setTimeout(function(){
+    if(s30ProgressInterval) clearInterval(s30ProgressInterval);
+    progress.style.width='100%';
+    barWrap.style.display='none';
+    ctaWrap.style.display='block';
+  },11000);
+}
+
+// ─── S32: Happy Code OTP Entry ───
+var happyCode='';
+function enterHappyCode(digit){
+  if(happyCode.length>=4) return;
+  happyCode+=digit;
+  updateHappyCodeDisplay();
+  // Auto-transition after 4 digits
+  if(happyCode.length===4){
+    setTimeout(function(){ go('s33'); },500);
+  }
+}
+function deleteHappyCode(){
+  happyCode=happyCode.slice(0,-1);
+  updateHappyCodeDisplay();
+}
+function updateHappyCodeDisplay(){
+  var digits=document.querySelectorAll('#s32-otp .hc-digit');
+  digits.forEach(function(d,i){
+    d.textContent=happyCode[i]||'';
+    d.style.borderColor=happyCode[i]?'var(--brand)':'#E8E4F0';
+  });
+}
+function submitHappyCode(){
+  if(happyCode.length===4){ go('s33'); }
+}
+// ─── S33: Lottery → Reset ───
+function resetFlow(){
+  happyCode='';
+  localStorage.removeItem('wiom_resume_screen');
+  localStorage.removeItem('wiom_payg_accepted');
+  resumeScreen=null;
+  go('s1');
+}
+
+// ─── S28: Optical Power Check ───
+var s28Interval=null;
+function startOpticalPowerCheck(){
+  var valueEl=document.getElementById('s28-value');
+  var statusEl=document.getElementById('s28-status');
+  var ctaWrap=document.getElementById('s28-cta-wrap');
+  // Reset
+  var current=0;
+  valueEl.textContent='0 dB';
+  valueEl.style.color='#161021';
+  statusEl.textContent='नेट बॉक्स तैयार किया जा रहा है...';
+  statusEl.style.color='#161021';
+  ctaWrap.style.visibility='hidden';
+  if(s28Interval) clearInterval(s28Interval);
+  // Count down from 0 to -21, ~150ms per step
+  s28Interval=setInterval(function(){
+    current--;
+    valueEl.textContent=current+' dB';
+    if(current<=-21){
+      clearInterval(s28Interval);
+      s28Interval=null;
+      valueEl.textContent='-21 dB';
+      valueEl.style.color='#008043';
+      statusEl.textContent='ऑप्टिकल पॉवर सही है';
+      statusEl.style.color='#008043';
+      statusEl.style.fontWeight='400';
+      ctaWrap.style.visibility='visible';
+    }
+  },150);
+}
+
+// ─── S23: Wiring Check + Audio ───
+var s23TimerInterval=null;
+function startWiringCheck(){
+  var seconds=59;
+  var timerEl=document.getElementById('s23-timer');
+  var timerState=document.getElementById('s23-timer-state');
+  var cbState=document.getElementById('s23-checkbox-state');
+  var cb=document.getElementById('s23-cb');
+  // Reset
+  timerState.style.display='flex';
+  cbState.style.display='none';
+  if(cb) cb.classList.remove('on');
+  timerEl.textContent='00:59';
+  // Play audio (12.3s)
+  var audio=document.getElementById('s23-audio');
+  if(audio){audio.currentTime=0;audio.play().catch(function(e){});}
+  // After 13.5s: switch to checkbox state
+  setTimeout(function(){
+    timerState.style.display='none';
+    cbState.style.display='block';
+  },13500);
+  // Countdown timer (visual)
+  if(s23TimerInterval) clearInterval(s23TimerInterval);
+  s23TimerInterval=setInterval(function(){
+    seconds--;
+    if(seconds<=0){clearInterval(s23TimerInterval);s23TimerInterval=null;timerEl.textContent='00:00';return;}
+    timerEl.textContent='00:'+seconds.toString().padStart(2,'0');
+  },1000);
+}
+
+function wiringAgree(el){
+  var c=el.querySelector('.cb');
+  if(c.classList.contains('on')) return;
+  c.classList.add('on');
+  if(s23TimerInterval){clearInterval(s23TimerInterval);s23TimerInterval=null;}
+  setTimeout(function(){ go('s24'); },450);
+}
+
+// ─── S24/S25: Wiring Photo Capture + Review ───
+var wiringPhotoData=null;
+function captureWiringPhoto(){
+  wiringPhotoData=snapPhoto('cam-wiring');
+  stopCam();
+  if(wiringPhotoData){
+    document.getElementById('wiring-photo-preview').src=wiringPhotoData;
+  }
+  go('s25');
+}
+function retakeWiringPhoto(){
+  wiringPhotoData=null;
+  go('s24');
+}
+
+// Live clock
+(function clock(){
+  var n=new Date(),h=n.getHours(),m=n.getMinutes().toString().padStart(2,'0'),a=h>=12?'PM':'AM',h12=h%12||12;
+  document.querySelectorAll('.sb>span:first-child').forEach(function(e){e.textContent=h12.toString().padStart(2,'0')+':'+m+' '+a});
+  setTimeout(clock,60000);
+})();
+</script>
+</body>
+</html>
