@@ -24,3 +24,5 @@ design-review.json
 # Old APKs (keep only the named release)
 *.apk
 !Expert App Net Box Setup Flow_Semwal_V1.apk
+cmdline-tools.zip
+*.zip

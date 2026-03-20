@@ -1,0 +1,1540 @@
+Wiom Net Box Setup (Installation)
+
+Detailed Master Technical Journey Document
+
+PayG Model · All Stakeholders (Customer / Installer / Systems)
+
+Updated: 26 January 2026 Rollout
+
+Table of Contents
+
+
+
+Overview & Definitions
+
+0. Key Definitions
+
+1. Partner Plus vs Expert App Differences
+
+2. End-to-End Macro Timeline
+
+
+
+Part A — Installer App Journey (Modules 1–23)
+
+Module 1 — Task Assignment & Notification
+
+Module 1.5 — Accept → Assign Sub-flow (Partner)
+
+Module 1.6 — Partner Plus: Reassign Installer
+
+Module 2 — Task List & Pre-Visit
+
+Module 3 — PayG Acknowledgement Gate (₹300 only)
+
+Module 4 — 3-Pin Carry Confirmation (Pre-Arrival)
+
+Module 5 — Arrival Confirmation Pop-up
+
+Module 6 — Selfie Capture
+
+Module 7 — Aadhaar Capture (KYC)
+
+Module 8 — PayG System Jankari
+
+Module 9 — Payment Collection & Verification (₹300)
+
+Module 10 — Switch-On & Provisioning
+
+Module 11 — Share Customer Details & ISP Profile Creation
+
+Module 12 — PayG Education: Create 30-Day 100 Mbps Plan
+
+Module 13 — Enter Net Box ID & Validation
+
+Module 14 — Fill ISP Details
+
+Module 15 — Connect Device / WiFi Name Setup
+
+Module 16 — Net Box Placement Proof
+
+Module 17 — 3-Pin Proof (Photo Capture)
+
+Module 18 — Wiring + Device Proof
+
+Module 19 — WiFi Auto-Connect & Permissions
+
+Module 20 — Optical Power Check
+
+Module 21 — Speed Test
+
+Module 22 — ISP Plan Recharge (Internal Action)
+
+Module 23 — PayG Education + Rating + Happy Code + Summary
+
+
+
+Part B — Customer App Journey
+
+Module 24 — Splash & Landing
+
+Module 25 — Location & Serviceability Check
+
+Module 26 — Phone & OTP Verification
+
+Module 27 — Booking Confirmation Payment (₹100)
+
+Module 28 — WiFi Name & Password Setup
+
+Module 29 — Vyom Chat Interface
+
+Module 30 — Date Confirmation & Engineer Assignment
+
+Module 31 — Pre-Installation Tasks via Chat
+
+Module 32 — Installation Day (Customer side)
+
+Module 33 — Rating & Happy Code
+
+Module 34 — Post-Installation
+
+Module 35 — Cancellation & Refund
+
+
+
+Part C — Wiom Systems / Backend
+
+Key Backend Events & APIs
+
+Part D — Feature Flags, Gates & Conditional Rules
+
+Feature Flags & Conditional Rules
+
+Part E — Device Types / ONT-Router Manufacturer Complications
+
+Device Types & Open Items
+
+Appendices
+
+Appendix 1 — Error Dialogs & Edge Cases
+
+Appendix 2 — Permission Flows
+
+
+
+
+
+0) Key Definitions
+
+Roles
+
+Customer: Uses Wiom Customer App + on-site actions.
+
+Installer: The person performing on-site setup at customer home.
+
+Typical: Technician using Expert App
+
+Rare: Partner himself using Partner Plus App
+
+Partner (Manager role): Uses Partner Plus App to manage assignment; can also act as Installer (rare).
+
+
+
+Surfaces
+
+Customer App (Wiom): booking + chat + happy code + rating + post-setup actions.
+
+Installer App: Expert App / Partner Plus App (setup journey is mostly identical).
+
+Wiom Systems: booking service, assignment, payments, notifications (FCM), Firestore listeners, router commands, device provisioning, events/states in backend stores.
+
+
+
+Terminology Rule
+
+All user-facing strings use "Net Box" (not "Device").
+
+"Installation" label is updated to "Setup / सेटअप" in key places.
+
+
+
+1) Partner Plus vs Expert App — Differences
+
+Same (mostly identical)
+
+Net Box setup journey screens, order, validations, gating, provisioning, happy code, rating prompts.
+
+
+
+Navigation Difference (corrected)
+
+⚠ CORRECTION (26 Jan update): Partner Plus App has "My Work" with To-Do / In-Progress tabs. Expert App has an additional "Tickets (टिकट)" tab (structure otherwise similar).
+
+
+
+Other Differences
+
+1. Partner Plus App has assignment control:
+
+Partner can select "who will do the setup" at acceptance time.
+
+Partner Plus App also has control to change the assigned team member from the Installation Detail page.
+
+UI text/screens for reassignment are not fully specified in current artifacts; only the capability is confirmed.
+
+
+
+2) End-to-End Macro Timeline
+
+Customer Side (pre → post)
+
+App opens → serviceability check → OTP
+
+₹100 booking confirmation payment
+
+WiFi name + password set (booking stage)
+
+Chat (Vyom): address + preferred date + optional pre-install tasks (Aadhaar, payment, etc.)
+
+Installation day: connect net + speed check + password confirmation flow
+
+Rating + Happy Code shared with installer
+
+Post-install: recharge / help / referral + cancellation / refund (if needed)
+
+
+
+Installer Side (pre → post)
+
+Modules 1–23. Step numbers reference Module numbers in Part A.
+
+[M1–1.6] Task assigned + notification → accept → assign
+
+[M2] Task list + optional ISP prefill from office
+
+[M3] PayG acknowledgement gate(s) — audio plays, checkbox required
+
+[M4] 3-pin carry confirmation (partner-level feature flag)
+
+[M5] Arrived confirmation pop-up → ROHIT_ARRIVED event
+
+[M6] Selfie capture
+
+[M7] Aadhaar capture (KYC) → payment gate activates
+
+[M8] PayG system jankari (₹300 only, QR option reminder)
+
+[M9] ₹300 security fee payment collection and verification (online)
+
+[M10] Switch-on + provisioning (300 sec timer)
+
+[M11] Share customer details → create ISP profile
+
+[M12] PayG education: create 30-day 100 Mbps ISP plan
+
+[M13] Enter Net Box ID → validation
+
+[M14] Fill ISP details
+
+[M15] Connect device / WiFi name setup
+
+[M16] Net Box placement proof
+
+[M17] 3-pin proof (photo capture, feature flagged)
+
+[M18] Wiring + device proof
+
+[M19] WiFi auto-connect + permissions
+
+[M20] Optical power check
+
+[M21] Speed test
+
+[M22] ISP plan recharge (internal action)
+
+[M23] PayG education (2 days net) → customer rating → Happy Code → post-setup summary + lottery
+
+
+
+Wiom Systems (continuous)
+
+Assignment logic + notifications
+
+Payment orchestration (Juspay + unified "payment done" state)
+
+Router commands (remote MQTT password update, band steering, SSID updates)
+
+State updates + event emission (Dynamo updates, Firestore triggers, backend state APIs)
+
+
+
+
+
+PART A — INSTALLER APP JOURNEY
+
+Expert App / Partner Plus App
+
+Note
+
+Wherever written "Technician", interpret as Installer (Technician OR Partner) unless explicitly "Partner-only control".
+
+
+
+Module 1 — Task Assignment & Notification
+
+Journey step: 1 of 15  |  Actor: Wiom System → Installer  |  Phase: Pre-installation
+
+
+
+1.1 Trigger
+
+New customer booking created → task assigned to partner/technician.
+
+
+
+1.2 Screen / State
+
+Full-page push notification overlay — appears even when user is in another app (e.g., Instagram).
+
+States:
+
+Default: notification shown
+
+Tapped: Wiom app opens to task detail/list
+
+"Task is already assigned" state if link opened after reassignment
+
+
+
+1.3 Key UI Content
+
+CTA: Accept booking
+
+"Nearby opportunity" card: "Earn more! Only [X] meters away..." with address details
+
+
+
+Module 1.5 — Accept → Assign Sub-flow (Partner-side)
+
+Journey step: 1 (sub-flow)  |  Actor: Partner (in Partner Plus App)
+
+
+
+Steps & Screens
+
+Opportunity card shows distance + location
+
+"Who will do the setup?" → choose technician
+
+Select time slot / date
+
+CTA: Send (भेज...)
+
+"Grow Network" | "Earn Money (24)" tabs shown in this area
+
+
+
+Module 1.6 — Partner Plus: Reassign Installer
+
+Journey step: 1 (sub-flow)  |  Actor: Partner  |  Entry: Installation Detail page
+
+
+
+System Effects (must happen)
+
+Assignment updated in backend
+
+Task visibility updates for newly assigned person
+
+Notifications triggered to new assignee
+
+
+
+Open
+
+UI strings, selection screen layout, and edge cases (e.g., reassignment after "Arrived") are not described in shared docs yet — limited to confirmed capability + system impact.
+
+
+
+Module 2 — Task List & Pre-Visit
+
+Journey step: 2 of 15  |  Actor: Installer  |  Phase: Pre-installation
+
+
+
+2.1 Primary Screen Components
+
+Top bar: technician name + rating + Help ("मदद")
+
+Tabs:
+
+Partner Plus App: "My Work (मेरे काम)" → To-Do / In-Progress
+
+Expert App: additionally has "Tickets (टिकट)" tab
+
+Task card includes: customer name, family number, phone + Call button, address, plan info, payment chip ("Payment done" or "Ask customer to pay at home"), deadline copy, ISP shortcut card.
+
+
+
+2.2 Label Updates (PayG hygiene)
+
+"New connection" → "New setup / नया सेटअप"
+
+"Start installation" → "Start setup / सेटअप शुरू करें"
+
+
+
+2.3 Call Dialog (guardrail)
+
+Trigger: Tap call button
+
+"Always call using the app call button... call only from this number..."
+
+Warning: direct dialer / different number will not connect
+
+CTAs: Call / Cancel
+
+IVR audio PayG education attached to this node.
+
+
+
+2.4 ISP Prefill from Office (time saver)
+
+App checks if ISP details already filled from office:
+
+If YES: skip ISP form on-site later (jumps past Module 14)
+
+If NO: show ISP form now or on-site
+
+
+
+Module 3 — PayG Acknowledgement Gate (₹300 only) + Audio
+
+Journey step: 3 of 15  |  Actor: Installer  |  Phase: Pre-installation gate
+
+
+
+3.1 What It Enforces
+
+Only ₹300 security fee is allowed; no other payment.
+
+
+
+3.2 Screen States
+
+Default: acknowledgement screen shown, IVR audio plays
+
+While audio playing: checkbox disabled; checkbox appears only after audio ends
+
+Acknowledged: checkbox checked → CTA enabled
+
+
+
+3.3 UI Content
+
+Title: PayG सेटअप में सिर्फ ₹300 सिक्योरिटी फीस होती है
+
+Checkbox: मैंने समझ लिया है, इस सेटअप में ₹300 के अलावा कोई और पेमेंट नहीं होती है
+
+CTA: Understood / समझ गया
+
+
+
+3.4 When Shown
+
+Shown for first 5 installations per technician (guardrail)
+
+Re-shown if overcharging complaint flag exists on the technician's account
+
+
+
+Module 4 — 3-Pin Carry Confirmation (Pre-Arrival)
+
+Journey step: 4 of 15  |  Actor: Installer  |  Phase: Before leaving for customer site
+
+
+
+What It Is
+
+Confirmation step ensuring the installer has the Wiom 3-pin plug before heading to the customer.
+
+Gated by partner-level feature flag — not shown to all partners.
+
+
+
+UI / Interaction
+
+Pop-up or acknowledgement screen confirming the Wiom 3-pin plug is in hand.
+
+Checkbox / CTA to confirm before proceeding with the task.
+
+Prevents on-site failures due to missing adapter.
+
+
+
+Distinction
+
+This is a carry-confirmation (pre-site). The physical 3-pin photo proof happens later at Module 17 (3-Pin Proof), which is part of the grouped Module 16–18 proof cluster on-site. Two separate steps.
+
+
+
+Module 5 — Arrival Confirmation Pop-up
+
+Journey step: 5 of 15  |  Actor: Installer  |  On-site step
+
+
+
+UI
+
+Bottom sheet: "Are you at the customer's home?"
+
+CTAs: Yes arrived / Cancel
+
+"02 recharges are still pending" warning shown where applicable
+
+
+
+Backend
+
+ROHIT_ARRIVED API → ROHIT_ARRIVED event
+
+FCM notifies customer app to enable payment
+
+Payment listeners activated in Firestore
+
+
+
+Module 6 — Selfie Capture
+
+Journey step: 6 of 15 (part 1)  |  Actor: Installer  |  On-site
+
+
+
+Front camera viewfinder
+
+Instruction: take selfie wearing Wiom Expert T-shirt
+
+Timer + capture
+
+"Rockstar" style success compliment screen
+
+
+
+Errors
+
+Camera permission denied
+
+Upload failure / low connectivity
+
+
+
+Backend
+
+SELFIE state API called on success
+
+
+
+Module 7 — Aadhaar Capture (KYC)
+
+Journey step: 6 of 15 (part 2)  |  Actors: Installer captures; customer provides Aadhaar  |  On-site
+
+
+
+Front capture (guide box) → preview labeled "Aadhaar: Front"
+
+Back capture (guide box) → preview labeled "Aadhaar: Back"
+
+
+
+Backend
+
+SHARED state API → AADHAAR_VERIFIED event
+
+Payment gate activates: if payment still pending after Aadhaar, system blocks progress until paid.
+
+
+
+Handoff
+
+Aadhaar can be completed either by customer pre-visit (Module 31 in Customer App) or by installer on-site here (Module 7). Either path is valid.
+
+
+
+Module 8 — PayG System Jankari (System Info Screen)
+
+Journey step: 7 of 15  |  Actor: Installer  |  Shown before payment collection
+
+
+
+Purpose
+
+A dedicated screen reinforcing the PayG payment rules before the installer proceeds to collect payment.
+
+Prevents overcharging by making rules explicit at the moment they matter most.
+
+
+
+Screen Content
+
+Title: PayG – System jankari
+
+Body: ₹300 सिक्योरिटी फीस होती है — इसके अलावा कोई भी पेमेंट की अनुमति नहीं है
+
+Additional info: कस्टमर अपनी ऐप में QR कोड से भी पेमेंट कर सकता है
+
+CTA: Understood / समझ गया
+
+
+
+Module 9 — Payment Collection & Verification (₹300 security fee)
+
+Journey step: 8 of 15  |  Actors: Customer + Installer + Wiom payment systems
+
+
+
+9.1 Payment Logic
+
+Online payment is the primary path in PayG model.
+
+Cash and online both converge to a single "Payment done" state; Autopay removed.
+
+
+
+9.2 Screens & States
+
+Payment pending (online): Installer prompts customer to pay via customer app (QR supported)
+
+Payment pending (cash): "Collect ₹300 cash and confirm payment"
+
+Payment checking: "Payment status is being checked" loader
+
+Payment done: "Payment done" chip/tag
+
+Customer payment incomplete warning: explicit messaging reinforcing ₹300-only
+
+
+
+9.3 Backend Sequence
+
+Online path: customer chooses online → Firestore notifies partner app → Create transaction API → Juspay → CAPTURE_PAYMENT event
+
+Cash path: customer chooses cash → Firestore notifies partner app → cash payment button enabled → wallet/pay APIs
+
+Both converge: Update booking in Dynamo → FCM notify apps → Unified "Payment done" state
+
+
+
+9.4 Payment Gate (post-Aadhaar)
+
+If payment still pending after Aadhaar (Module 7): system blocks progress until payment is confirmed.
+
+
+
+Module 10 — Switch-On & Provisioning
+
+Journey step: 9 of 15 (part 1)  |  Actors: Installer switches on; Wiom provisions  |  Device types: Syrotech / GX / TP-Link
+
+
+
+Screens / States
+
+Switch-on instruction + confirmation checkbox
+
+Full-screen provisioning loader — exactly 300 seconds / 5 min
+
+"Net Box is ready" success state
+
+
+
+Router / Backend Actions
+
+Connect to WiomNet WiFi signal
+
+Single SSID (band steering), SSID name update, open primary SSID
+
+Send PPPoE credentials via backend command (SSH removed)
+
+Restart WiFi service to reflect changes
+
+HTTP call to router to allow internet to installer device IP
+
+CONFIGURATION state API updated
+
+
+
+Module 11 — Share Customer Details & ISP Profile Creation
+
+Journey step: 9 of 15 (part 2)  |  Actor: Installer  |  Runs during provisioning wait
+
+
+
+Screen Content
+
+Customer name / phone
+
+Address
+
+Family number
+
+Aadhaar reference indicator
+
+ISP account status (created / pending)
+
+CTA: Confirm and share customer details
+
+
+
+System Action
+
+CREATE_ACCOUNT event triggered: (lco, deviceId, mobile)
+
+ISP account created; triggers plan creation in the backend
+
+
+
+Timing
+
+This step runs while the Net Box provisioning timer (Module 10, 300s) is running — the installer fills details during the wait.
+
+
+
+Module 12 — PayG Education: Create 30-Day 100 Mbps Plan
+
+Journey step: 9 of 15 (part 3)  |  Actor: Installer  |  Part of ISP profile creation flow
+
+
+
+Purpose
+
+Educates the installer on the ISP plan being created for the customer before plan confirmation.
+
+Reinforces the PayG model — this is not a customer payment, it is an internal ISP account setup.
+
+
+
+Screen Content
+
+Key
+
+In PayG model, all customers are on the same plan.
+
+Instruction text: कस्टमर का 30 दिन, 100 Mbps का ISP रिचार्ज करें
+
+Audio plays: "30 days + 100 Mbps information" for plan education
+
+CTA: OK / समझ गया
+
+
+
+Includes WhatsApp Update
+
+When installer selects "share customer details to office via WhatsApp", the message now includes:
+
+Plan speed: 100 Mbps
+
+Validity: 30 days
+
+
+
+Module 13 — Enter Net Box ID & Validation
+
+Journey step: 10 of 15 (part 1)  |  Actor: Installer  |  Device types: Syrotech / GX / TP-Link
+
+
+
+Enter/scan Net Box ID → validating → success OR error
+
+
+
+Error Cases (error code 255)
+
+Not found (ID not in system)
+
+Faulty device
+
+Already in use
+
+Not assigned to you
+
+Each error: Hindi + English title/body, CTA: Enter another Net Box ID, CTA: Stop installation.
+
+
+
+Module 14 — Fill ISP Details
+
+Journey step: 10 of 15 (part 2)  |  Actor: Installer
+
+
+
+Connection Type Tabs
+
+PPPoE (default): Username, Password, Service Name
+
+Static IP: IP, gateway, netmask, DNS fields
+
+DHCP: auto-configured; verify current settings
+
+
+
+Additional Elements
+
+VLAN tagging options: TAG | TRANSPARENT | UNTAG
+
+Pre-fill logic: If filled from office (Module 2) → skip this form on-site
+
+
+
+Module 15 — Connect Device / WiFi Name Setup
+
+Journey step: 10 of 15 (part 3)  |  Actors: Installer + Customer
+
+
+
+Title example: "Setup WIOM Gold"
+
+Input: write name for the WiFi connection
+
+CTA: Set favourite WiFi name
+
+System action: customer app auto-connects using the newly named WiFi network
+
+
+
+Sync
+
+WiFi name chosen by customer at booking stage (Customer Module 28) should prefill here. Installer can confirm or update.
+
+
+
+Module 16 — Net Box Placement Proof
+
+Journey step: 11 of 15 (part 1 of 3)  |  Actor: Installer
+
+
+
+Placement Rules
+
+Updated body text: फ्रिज, टीवी और मेटल के सामान जैसे अलमारी से दूर है
+
+Away from fridge, TV, metal objects like almirah
+
+
+
+Flow
+
+Placement instruction screen shown
+
+Timer loader
+
+Checkbox confirmation
+
+Photo capture of Net Box placement
+
+
+
+Module 17 — 3-Pin Proof (Photo Capture)
+
+Journey step: 11 of 15 (part 2 of 3)  |  Actor: Installer
+
+
+
+Instructions
+
+Plug Net Box adapter into Wiom 3-pin; 3-pin must be clearly visible in photo
+
+Heading: फोटो में व्योम वाला 3 पिन साफ दिखना चाहिए
+
+Body: नेट बॉक्स का एडाप्टर हमेशा व्योम वाले 3 पिन में ही लगाएं, फोटो में 3 पिन साफ दिखना जरूरी है।
+
+
+
+Flow
+
+Timer loader (1–2 min)
+
+Checkbox confirmation
+
+Camera capture: 3-pin plug photo
+
+Photo guidance: ✅ Wiom 3-pin clearly visible vs ❌ unclear/hidden socket (wrong)
+
+
+
+Feature flag
+
+3-pin photo capture is gated by partner-level feature flag. The pre-arrival carry confirmation (Module 4) and this photo proof are two separate steps.
+
+
+
+Module 18 — Wiring + Device Proof
+
+Journey step: 11 of 15 (part 3 of 3)  |  Actor: Installer
+
+
+
+Wiring guide shown (do wiring while device is provisioning)
+
+"I have done wiring correctly" checkbox
+
+
+
+Photo Capture Sequence
+
+Net Box photo during provisioning (wiring photo)
+
+Net Box + wiring photo after provisioning complete
+
+3-pin plug photo (where required by feature flag)
+
+
+
+Module 19 — WiFi Auto-Connect & Permissions
+
+Journey step: 12 of 15 (part 1)  |  Actors: Installer + system
+
+
+
+Permissions Handled
+
+Location permission
+
+Camera permission
+
+WiFi auto-connect permission
+
+
+
+States
+
+WiFi already on → skip permission prompt
+
+WiFi off → request enable
+
+Connected to Wiom Net → success
+
+Failure → troubleshooting ("recheck multiple reasons")
+
+Mobile data ON/OFF screens (mobile data may interfere with auto-connect)
+
+
+
+Module 20 — Optical Power Check
+
+Journey step: 12 of 15 (part 2)  |  Actors: Wiom system checks; installer verifies
+
+
+
+Checking loader
+
+Optimal range success (value shown)
+
+High optical power → troubleshoot (attenuator needed)
+
+Low optical power → troubleshoot (fiber bend/break etc.)
+
+CTA to proceed to speed test
+
+
+
+Module 21 — Speed Test
+
+Journey step: 13 of 15 (part 1)  |  Actor: Installer
+
+
+
+Speed test animation + "Check Speed"
+
+Result display (Mbps)
+
+"Is the speed correct?" Yes/No (bottom sheet confirmation)
+
+"Play again" option for retest
+
+Lottery incentive messaging tied to on-time completion
+
+
+
+Backend
+
+SPEED_TEST state API updated
+
+SSH module removed from speed test — no longer used
+
+
+
+Module 22 — ISP Plan Recharge (Internal ISP Plan Action)
+
+Journey step: 13 of 15 (part 2)  |  Actor: Installer
+
+
+
+Key
+
+In PayG model, all customers are on the same plan. This is an internal ISP recharge action, not a customer payment.
+
+Instruction: recharge ISP plan for 100 Mbps, 30-day
+
+Screen copy: कस्टमर का 30 दिन, 100 Mbps का ISP रिचार्ज करें
+
+CTA: OK
+
+
+
+Module 23 — PayG Education + Customer Rating + Happy Code + Summary
+
+Journey step: 14–15 of 15  |  Actors: Installer + Customer
+
+
+
+23.1 PayG 2-Day Education Screen
+
+Heading: अब कस्टमर अगले 2 दिन तक नेट का इस्तेमाल कर सकते हैं
+
+Body: इसके बाद रिचार्ज कस्टमर अपनी मर्ज़ी से करता है
+
+CTA: समझ गया
+
+Reinforces: customer is NOT expected to pay anything else today.
+
+
+
+23.2 Customer Rating Prompt
+
+Installer asks customer to rate setup experience in their app
+
+Incentive: "1 extra star for completing within 12 hours"
+
+
+
+23.3 Happy Code Verification
+
+Installer asks customer for their 4-digit Happy Code
+
+Enter code → Verifying loader → Success
+
+Backend: Verify Happy Code API → OTP_VERIFIED event
+
+
+
+23.4 Post-Setup Summary
+
+"Understood / समझ गया" style acknowledgement screen
+
+Message confirms: customer has 2 days of net access, then recharges whenever they want
+
+
+
+23.5 Lottery for Technician
+
+Lottery result shown to technician after task completion
+
+Outcome based on on-time completion and setup quality metrics
+
+
+
+
+
+PART B — CUSTOMER APP JOURNEY
+
+Wiom Customer App
+
+
+
+Module 24 — Splash & Landing
+
+Step: Pre-booking  |  Actor: Customer
+
+
+
+Splash brand: Wiom logo + "Recharge-wala ghar ka net" + "jab chahiye tab recharge"
+
+"Is it available in my area?" CTA
+
+Secondary CTA for existing users / just checking area
+
+"How it works" informational screens: Net Box installed, recharge like mobile, whole family (8–12 devices)
+
+
+
+Module 25 — Location & Serviceability Check
+
+Step: Pre-booking gate  |  Actors: Customer + Wiom system
+
+
+
+OS precise location permission
+
+"Allow only while using the app" guidance
+
+"Open settings" redirect screen if denied
+
+Serviceability check result decides if user can proceed to booking
+
+
+
+Module 26 — Phone & OTP Verification
+
+Step: Booking  |  Actor: Customer
+
+
+
+Registration Screen
+
+Fields: phone number, name
+
+Validation: phone must be 10 digits
+
+CTA leads into payment flow (₹100 booking confirm)
+
+
+
+OTP Screen
+
+4-digit OTP entry
+
+Timer + resend logic
+
+Incorrect OTP error state
+
+
+
+Module 27 — Booking Confirmation Payment (₹100)
+
+Step: Booking confirm  |  Actor: Customer + payment backend
+
+
+
+Payment methods: UPI / online options
+
+Friend/family help flow: QR / WhatsApp share, waiting screen, status checking loader, success
+
+Output: booking moves forward; tracker updates.
+
+
+
+Module 28 — WiFi Name & Password Setup (booking stage)
+
+Step: Post-payment setup preference  |  Actor: Customer
+
+
+
+WiFi Name
+
+Suggested names list + custom input
+
+Validation: max 28 characters, numbers + letters only
+
+CTA: check name → save name
+
+
+
+Password
+
+Set password + confirm password
+
+Validation: min 8 characters
+
+Password copy toast exists
+
+
+
+Module 29 — Vyom Chat Interface
+
+Step: Post booking  |  Actors: Customer + Vyom bot
+
+
+
+Header: Vyom online + home net name + status chip
+
+"Ask here..." input placeholder
+
+Quick actions: connect net, pay online, next recharge, booking details, cancel booking, help, re-book
+
+Save number prompt: flow to save Wiom number in contacts
+
+
+
+Module 30 — Date Confirmation & Engineer Assignment
+
+Step: Pre-installation  |  Actors: Customer + system
+
+
+
+Calendar date selection
+
+"This day is right" or "choose another day" (chat confirmation)
+
+After date confirmation: system searches for engineer and assigns (handoff to Installer Module 1)
+
+
+
+Module 31 — Pre-Installation Tasks via Chat
+
+Step: Optional pre-work  |  Actor: Customer
+
+
+
+Triggers (chat buttons)
+
+Upload Aadhaar
+
+Make payment
+
+Write address
+
+"Yes, I am at net location" confirmation
+
+
+
+Aadhaar Upload
+
+Front + back photo
+
+Source: camera or gallery
+
+CTA: share Aadhaar card
+
+Defer option: share later
+
+Incomplete warning dialog if user tries to exit mid-upload
+
+
+
+Handoff
+
+Aadhaar can be completed either by customer (Module 31) or installer (Module 7).
+
+
+
+Module 32 — Installation Day (Customer side)
+
+Step: After installer completes setup  |  Actors: Customer + system
+
+
+
+Net connected confirmation screen
+
+Video-based speed check: Play test video → "How did it play?" (buffered vs played well)
+
+"Connect net" CTA + guidance if phone not connected to right net
+
+"Tell engineer net is not working properly" + Re-check speed CTA (speed issue escalation)
+
+Password setup prompt (customer side)
+
+
+
+Module 33 — Rating & Happy Code
+
+Step: Post-installation closure  |  Actor: Customer
+
+
+
+Rating
+
+Rate experience card
+
+Reasons list for low ratings: not installed on chosen date, had to call repeatedly, took too long, misbehavior, other
+
+
+
+Submission
+
+Submit rating
+
+Option: rate on Play Store (pre-filled review copy + "copied" guidance)
+
+
+
+Happy Code
+
+Customer receives code and shares with installer (Installer Module 20)
+
+
+
+Module 34 — Post-Installation
+
+Step: Ongoing usage  |  Actor: Customer
+
+
+
+Chat quick actions: Recharge, Troubleshoot/help, Referral, Booking details view, Change WiFi name/password
+
+Tracking states: Payment started/processing/success/fail; Refund tracking where applicable
+
+
+
+Module 35 — Cancellation & Refund
+
+Step: Branch (pre-install cancellation or system cancellation)  |  Actor: Customer + system
+
+
+
+Trigger
+
+User asks to cancel booking in chat
+
+
+
+States
+
+Cancellation initiated → refund process started → refund processing → refund received
+
+Re-book option appears
+
+
+
+System-triggered Cancellation Examples
+
+Location becomes not serviceable after address update
+
+Partner cancels after assignment/date
+
+
+
+
+
+PART C — WIOM SYSTEMS / BACKEND
+
+
+
+Key Backend Events & APIs
+
+
+
+Event / API
+
+Trigger / Purpose
+
+ROHIT_ARRIVED API + event
+
+Arrival confirmation; FCM notify app to enable payment
+
+SELFIE state API
+
+After installer selfie capture
+
+SHARED state API
+
+After Aadhaar; activates payment listeners
+
+AADHAAR_VERIFIED event
+
+KYC completion
+
+Create transaction API
+
+Initiates online payment flow
+
+Payment via Juspay
+
+Payment processing
+
+CAPTURE_PAYMENT event
+
+Payment captured
+
+Update booking in Dynamo
+
+Booking state persisted
+
+FCM notify apps
+
+Payment success notification
+
+Unified payment done state
+
+Both cash + online converge here
+
+Remote MQTT command
+
+Updates SSID password during installation
+
+HTTP call to router
+
+Allow internet to installer device IP
+
+CONFIGURATION state API
+
+Marks configuration step complete
+
+SPEED_TEST state API
+
+Marks speed test step
+
+CREATE_ACCOUNT event
+
+lco, deviceId, mobile — account created
+
+Verify Happy Code API
+
+Verifies 4-digit Happy Code
+
+OTP_VERIFIED event
+
+Happy Code verified
+
+
+
+Router Actions (26 Jan)
+
+Single SSID (band steering) + SSID name update + open primary SSID
+
+PPPoE credentials sent via backend command (SSH removed)
+
+Restart WiFi service to reflect changes
+
+Remote fallback: band steering enabled, SSID name update, no password protection on SSID
+
+Configuration step timer: exactly 300 seconds / 5 min
+
+
+
+
+
+PART D — FEATURE FLAGS, GATES & CONDITIONAL RULES
+
+
+
+Feature Flags & Conditional Rules
+
+
+
+Rule / Flag
+
+Condition
+
+Behaviour
+
+₹300-only guardrail acknowledgement
+
+First 5 installs per technician
+
+Shown; hidden after 5th (unless complaint)
+
+₹300-only guardrail acknowledgement
+
+Complaint flag for overcharging exists
+
+Re-shown regardless of install count
+
+3-pin carry education popup
+
+Partner-level feature flag
+
+Shown at task assigned stage
+
+Payment gate after Aadhaar
+
+Payment pending after Aadhaar capture
+
+Block until payment completes
+
+ISP prefill skip
+
+ISP details filled from office
+
+Skip on-site ISP form
+
+Unified payment done
+
+Both cash and online payment success
+
+Map to same payment done event
+
+
+
+
+
+PART E — DEVICE TYPES / ONT-ROUTER COMPLICATIONS
+
+
+
+Device Types & Open Items
+
+
+
+Confirmed
+
+Net Box ID validation supports Syrotech / GX / TP-Link
+
+Device type is determined by Net Box ID (system-side mapping)
+
+Provisioning flow is device-agnostic from UI perspective
+
+
+
+Not Yet Specified (needs input)
+
+Exact differences in setup steps if device is ONT + router separate vs single combined Net Box
+
+Manufacturer-specific exceptions (SSID behaviour, provisioning time, fallback conditions, LED interpretation, reset method)
+
+Device-specific wiring diagrams per manufacturer
+
+
+
+Action needed
+
+To complete this section, share either (a) device SOPs, or (b) backend rules per manufacturer.
+
+
+
+
+
+APPENDICES
+
+
+
+Appendix 1 — Error Dialogs & Edge Cases
+
+
+
+Net Box ID Errors (error code 255)
+
+Not found
+
+Faulty Net Box
+
+Already in use
+
+Not assigned
+
+Each includes: Hindi + English titles/bodies, CTA: Enter another Net Box ID, CTA: Stop installation.
+
+
+
+Network / WiFi Connection Errors
+
+Net off / no signal
+
+"Forget (Name)" instruction shown when wrong signal connected
+
+Wrong WiFi connected
+
+CTAs: Open settings / Try again, Stop installation.
+
+
+
+Setup Failed
+
+"Net could not be set up on the net box"
+
+CTAs: Connect to WiFi signal / Reset net box
+
+
+
+Appendix 2 — Permission Flows
+
+
+
+Location permission (grant/deny → settings redirect)
+
+Camera permission
+
+WiFi auto-connect permission
+
+Mobile data toggle guidance
+
+
+

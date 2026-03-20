@@ -1,0 +1,1498 @@
+CLAUDE CODE RESOURCE DOCUMENT
+
+Figma → Android APK · Flutter Prototype Build Guide
+
+Figma File: PwrhO9KnvdZ4NNYwz3B85d  ·  Node: 200-7929  ·  Section: Test Android Flow
+
+
+
+
+
+1. QUICK START PROMPT FOR CLAUDE CODE
+
+Paste this at the start of your Claude Code session to orient it immediately:
+
+
+
+You are building a Flutter Android APK prototype from a Figma design.
+
+Figma file key: PwrhO9KnvdZ4NNYwz3B85d  |  Root node: 200-7929
+
+Design artboard: 360×720 dp. Use ScreenUtilInit(designSize: Size(360, 720)).
+
+Font: GoogleFonts.notoSans() exclusively — weights 400 / 600 / 700.
+
+Noto Sans is required for full Devanagari (Hindi) script support.
+
+Primary brand color: #D9008D  |  Background: #FAF9FC  |  Header: #443152
+
+All icons: Flutter built-in Icons.* or material_symbols_icons package.
+
+Camera screens: use the `camera` pub package with CameraPreview in a Stack.
+
+Navigation: go_router, strictly linear push flow — no bottom nav, no tabs.
+
+Fetch each Figma screen node individually before coding each screen.
+
+Screens to build (in flow order):
+
+  199:4938  → Task list / partner cards (entry screen)
+
+  200:7193  → Acknowledgement screen
+
+  200:5143  → Customer transfer information screen
+
+  200:5119  → Dialog / confirmation modal
+
+  200:5769  → Camera / photo capture screen
+
+  200:5853  → Aadhaar capture viewfinder (camera overlay)
+
+  200:6631  → Photo preview / review screen
+
+  200:6691  → Aadhaar front photo capture
+
+  200:6748  → Aadhaar back photo capture
+
+  200:6814  → Both sides reviewed screen
+
+  200:5313  → Device setup instruction screen
+
+  200:5385  → Device setup step 2
+
+  200:5440  → Device setup step 3 (with loader)
+
+  200:6032  → Installation checklist (loading state)
+
+  200:6687  → Loading / spinner screen
+
+  200:5924  → Summary / completion screen
+
+
+
+2. FLUTTER PROJECT SETUP COMMANDS
+
+Run these commands in terminal before writing any Dart code:
+
+
+
+flutter create android_flow_prototype --platforms android
+
+cd android_flow_prototype
+
+# Set minimum SDK in android/app/build.gradle:
+
+#   minSdkVersion 21   (required for camera package)
+
+#   compileSdkVersion 34
+
+flutter pub get
+
+flutter build apk --release
+
+
+
+3. pubspec.yaml — Complete Dependencies
+
+Replace the dependencies section in pubspec.yaml with the following:
+
+
+
+name: android_flow_prototype
+
+description: Figma to Flutter prototype — Test Android Flow
+
+
+
+environment:
+
+  sdk: '>=3.0.0 <4.0.0'
+
+
+
+dependencies:
+
+  flutter:
+
+    sdk: flutter
+
+
+
+  # Typography — Noto Sans (Devanagari + Latin)
+
+  google_fonts: ^6.2.1
+
+
+
+  # Camera — Aadhaar capture + selfie screens
+
+  camera: ^0.11.0
+
+  image_picker: ^1.1.2
+
+
+
+  # Permissions — camera, storage
+
+  permission_handler: ^11.3.1
+
+
+
+  # Responsive scaling — designSize: Size(360, 720)
+
+  flutter_screenutil: ^5.9.3
+
+
+
+  # Navigation — linear push flow
+
+  go_router: ^14.2.7
+
+
+
+  # Extended Material icon set
+
+  material_symbols_icons: ^4.2719.3
+
+
+
+4. AndroidManifest.xml — Required Permissions
+
+Add these inside the <manifest> tag in android/app/src/main/AndroidManifest.xml:
+
+
+
+<uses-permission android:name="android.permission.CAMERA"/>
+
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+
+    android:maxSdkVersion="28"/>
+
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+
+    android:maxSdkVersion="32"/>
+
+<uses-feature android:name="android.hardware.camera" android:required="true"/>
+
+
+
+Also inside the <application> tag, set:
+
+android:requestLegacyExternalStorage="true"
+
+
+
+5. COLOR DESIGN TOKENS
+
+All colors extracted from Figma variable definitions. Use as Flutter Color constants:
+
+
+
+5a. Core / Actions
+
+Token
+
+Hex Value
+
+Flutter Constant
+
+pri_cta_bg
+
+#D9008D
+
+Color(0xFFD9008D)
+
+pri_cta_fg
+
+#FAF9FC
+
+Color(0xFFFAF9FC)
+
+pri_cta_disable_bg
+
+#A7A1B2
+
+Color(0xFFA7A1B2)
+
+sec_cta_fg
+
+#D9008D
+
+Color(0xFFD9008D)
+
+link_label_fg
+
+#D9008D
+
+Color(0xFFD9008D)
+
+
+
+5b. Backgrounds
+
+Token
+
+Hex Value
+
+Flutter Constant
+
+bg_surface / bg_neutral_pri
+
+#FAF9FC
+
+Color(0xFFFAF9FC)
+
+bg_neutral_sec
+
+#F1EDF7
+
+Color(0xFFF1EDF7)
+
+bg_neutral_tertiary
+
+#E8E4F0
+
+Color(0xFFE8E4F0)
+
+bg_neutral_disable
+
+#D7D3E0
+
+Color(0xFFD7D3E0)
+
+bg_brand_pri
+
+#FFE5F6
+
+Color(0xFFFFE5F6)
+
+bg_brand_sec
+
+#FFCCED
+
+Color(0xFFFFCCED)
+
+bg_brand_focus
+
+#D9008D
+
+Color(0xFFD9008D)
+
+bg_dark
+
+#161021
+
+Color(0xFF161021)
+
+bg_partner_header
+
+#443152
+
+Color(0xFF443152)
+
+bg_partner_light_purple
+
+#60506C
+
+Color(0xFF60506C)
+
+bg_positive_focus
+
+#008043
+
+Color(0xFF008043)
+
+bg_info_pri
+
+#F1E5FF
+
+Color(0xFFF1E5FF)
+
+bg_info_focus
+
+#6D17CE
+
+Color(0xFF6D17CE)
+
+bg_warning_pri
+
+#FFE6CC
+
+Color(0xFFFFE6CC)
+
+
+
+5c. Text Colors
+
+Token
+
+Hex
+
+Flutter
+
+pri_text
+
+#161021
+
+Color(0xFF161021)
+
+hint_text
+
+#A7A1B2
+
+Color(0xFFA7A1B2)
+
+dark_fg / on_positive_fg
+
+#FAF9FC
+
+Color(0xFFFAF9FC)
+
+warning_text
+
+#B85C00
+
+Color(0xFFB85C00)
+
+info_text
+
+#6D17CE
+
+Color(0xFF6D17CE)
+
+warning_dark_fg
+
+#FF7F00
+
+Color(0xFFFF7F00)
+
+
+
+5d. Strokes / Borders
+
+Token
+
+Hex
+
+Flutter
+
+stroke_neutral_pri
+
+#E8E4F0
+
+Color(0xFFE8E4F0)
+
+stroke_neutral_focus
+
+#352D42
+
+Color(0xFF352D42)
+
+stroke_selection / stroke_brand_focus
+
+#D9008D
+
+Color(0xFFD9008D)
+
+stroke_info_focus
+
+#6D17CE
+
+Color(0xFF6D17CE)
+
+
+
+5e. Icon Colors
+
+Token
+
+Hex
+
+Flutter
+
+icon_brand
+
+#D9008D
+
+Color(0xFFD9008D)
+
+icon_neutral_action
+
+#352D42
+
+Color(0xFF352D42)
+
+icon_neutral_no_action
+
+#A7A1B2
+
+Color(0xFFA7A1B2)
+
+icon_positive
+
+#008043
+
+Color(0xFF008043)
+
+icon_info
+
+#6D17CE
+
+Color(0xFF6D17CE)
+
+icon_white
+
+#FAF9FC
+
+Color(0xFFFAF9FC)
+
+
+
+6. TYPOGRAPHY TOKENS
+
+All type styles use Noto Sans via google_fonts. Letter spacing is 0 throughout.
+
+
+
+Token
+
+Size / Weight
+
+Line Height
+
+Flutter Usage
+
+Display/D1_48_Bold
+
+48dp / 700
+
+64dp
+
+notoSans(fontSize:48,fontWeight:FontWeight.w700)
+
+Title/T2_24_Bold
+
+24dp / 700
+
+32dp
+
+notoSans(fontSize:24,fontWeight:FontWeight.w700)
+
+Title/T3_20_Bold
+
+20dp / 700
+
+28dp
+
+notoSans(fontSize:20,fontWeight:FontWeight.w700)
+
+Title/T4_16_Bold
+
+16dp / 700
+
+24dp
+
+notoSans(fontSize:16,fontWeight:FontWeight.w700)
+
+Title/T4_16_Regular
+
+16dp / 400
+
+24dp
+
+notoSans(fontSize:16,fontWeight:FontWeight.w400)
+
+Body/B1_16_Bold
+
+16dp / 700
+
+24dp
+
+notoSans(fontSize:16,fontWeight:FontWeight.w700)
+
+Body/B1_16_Regular
+
+16dp / 400
+
+24dp
+
+notoSans(fontSize:16,fontWeight:FontWeight.w400)
+
+Body/B2_14_Semibold
+
+14dp / 600
+
+20dp
+
+notoSans(fontSize:14,fontWeight:FontWeight.w600)
+
+Body/B2_14_Regular
+
+14dp / 400
+
+20dp
+
+notoSans(fontSize:14,fontWeight:FontWeight.w400)
+
+Label/L1_16_Bold
+
+16dp / 700
+
+24dp
+
+notoSans(fontSize:16,fontWeight:FontWeight.w700)
+
+Label/L2_14_Semibold
+
+14dp / 600
+
+20dp
+
+notoSans(fontSize:14,fontWeight:FontWeight.w600)
+
+Label/L2_14_Regular
+
+14dp / 400
+
+20dp
+
+notoSans(fontSize:14,fontWeight:FontWeight.w400)
+
+Label/L3_12_Semibold
+
+12dp / 600
+
+16dp
+
+notoSans(fontSize:12,fontWeight:FontWeight.w600)
+
+Body/B3_12_Regular
+
+12dp / 400
+
+16dp
+
+notoSans(fontSize:12,fontWeight:FontWeight.w400)
+
+
+
+7. SPACING & BORDER RADIUS TOKENS
+
+
+
+Token
+
+Value
+
+Usage Context
+
+Flutter
+
+space-4
+
+4dp
+
+Icon gaps, tight padding
+
+4.w or EdgeInsets.all(4.w)
+
+space-8
+
+8dp
+
+Icon-to-text gap
+
+8.w
+
+space-12
+
+12dp
+
+Card inner padding
+
+12.w
+
+space-16
+
+16dp
+
+Standard screen margin
+
+16.w
+
+space-24
+
+24dp
+
+Section gap
+
+24.h
+
+space-32
+
+32dp
+
+Large gap
+
+32.h
+
+space-48
+
+48dp
+
+Bottom action bar height
+
+48.h
+
+radius-below-24dp
+
+4dp
+
+Very small elements
+
+BorderRadius.circular(4.r)
+
+radius-below-40dp
+
+8dp
+
+Chips, small cards
+
+BorderRadius.circular(8.r)
+
+radius-inner-card
+
+12dp
+
+Inner card corners
+
+BorderRadius.circular(12.r)
+
+radius-main-card
+
+16dp
+
+Main card corners
+
+BorderRadius.circular(16.r)
+
+radius-large
+
+24dp
+
+Dialogs, modals, bottom sheets
+
+BorderRadius.circular(24.r)
+
+
+
+8. ICON MAPPING — Figma Layer → Flutter
+
+All icons from your Figma file with their Flutter equivalents. Use Icons.* (built-in) wherever possible.
+
+
+
+Figma Layer Name
+
+Flutter Widget
+
+Notes
+
+arrow_back
+
+Icons.arrow_back
+
+Back navigation
+
+close
+
+Icons.close
+
+Close / dismiss screens
+
+filter_alt
+
+Icons.filter_alt
+
+Filter icon in header
+
+menu
+
+Icons.menu
+
+Hamburger / more options
+
+more_icon / more_vert
+
+Icons.more_vert
+
+Overflow menu
+
+flash_on
+
+Icons.flash_on
+
+Camera flash toggle (camera screens)
+
+Shutter butten
+
+IconButton(icon: Icon(Icons.camera_alt))
+
+64×64dp circle CTA on camera screens
+
+alarm
+
+Icons.alarm
+
+Time/schedule info
+
+id-card
+
+Icons.badge
+
+Aadhaar / identity card context
+
+photo / 24 / Outline
+
+Icons.photo_outlined
+
+Photo placeholder in Aadhaar screens
+
+language_icon
+
+Icons.language
+
+Language toggle in top bar
+
+checkbox-tick
+
+Checkbox widget
+
+Acknowledgement / agree screens
+
+radio-button
+
+Radio widget
+
+Installation checklist steps
+
+tick
+
+Icons.check_circle
+
+Completed step indicator
+
+download
+
+Icons.download
+
+Document download action
+
+error_outline
+
+Icons.error_outline
+
+Info/warning hint text
+
+device_hub
+
+Icons.device_hub
+
+Connection/device status
+
+Loader
+
+CircularProgressIndicator()
+
+18×18dp, used in installation checklist
+
+rupee_reciept
+
+Icons.receipt
+
+Payment receipt
+
+Rocket
+
+Icons.rocket_launch
+
+Time-saving nudge tag
+
+arrow-right
+
+Icons.arrow_forward
+
+CTA arrow in info cards
+
+ic_signal_cellular_3_bar
+
+Icons.signal_cellular_alt
+
+Status bar cellular signal
+
+ic_signal_wifi_3_bar
+
+Icons.wifi
+
+Status bar WiFi
+
+ic_battery_charging_80
+
+Icons.battery_charging_full
+
+Status bar battery
+
+ic_mail_outline
+
+Icons.mail_outline
+
+Status bar notification
+
+
+
+9. SCREEN INVENTORY & FIGMA NODE IDs
+
+Fetch each node from Figma MCP before coding the corresponding Flutter screen. All frames are 360×720dp.
+
+
+
+Node ID
+
+Screen Name
+
+Flutter File
+
+Key Components
+
+199:4938
+
+Task List / Partner Cards
+
+task_list_screen.dart
+
+ScrollView, PA_Headers, card with arrow CTA, avatar stack
+
+200:7193
+
+Acknowledgement
+
+acknowledgement_screen.dart
+
+Graphic icon, headline, checkbox agree, disabled CTA
+
+200:5143
+
+Customer Transfer Info
+
+customer_info_screen.dart
+
+Info card with alarm, customer details, CTA bottom bar
+
+200:5119
+
+Dialog — Confirm ticket
+
+confirm_dialog.dart
+
+312dp modal, icon bg ellipse, title, Primary CTA
+
+200:5259
+
+Dialog — 3-pin setup
+
+pin_dialog.dart
+
+Image 200×200, title, info text, checkbox agree
+
+200:5769
+
+Camera / Photo screen
+
+camera_screen.dart
+
+Full-screen CameraPreview, flash_on top-right, 64dp shutter at y=616
+
+200:5853
+
+Aadhaar Capture Viewfinder
+
+aadhaar_capture_screen.dart
+
+CameraPreview, 328×199dp overlay rect, Hindi hint text, shutter btn
+
+200:6631
+
+Photo Preview / Review
+
+photo_preview_screen.dart
+
+Full image preview, close X on photo, primary CTA bottom
+
+200:6691
+
+Aadhaar Front Photo
+
+aadhaar_front_screen.dart
+
+Photo placeholder, '+ फोटो लें' label, top app bar
+
+200:6748
+
+Aadhaar Back Photo
+
+aadhaar_back_screen.dart
+
+Same as front but Back label, shows captured front image
+
+200:6814
+
+Both Sides Reviewed
+
+aadhaar_review_screen.dart
+
+Two 328×199 image thumbnails, top bar, primary CTA
+
+200:5313
+
+Device Setup Step 1
+
+device_setup_1_screen.dart
+
+136dp header, 328×328 instruction image, checkbox agree
+
+200:5385
+
+Device Setup Step 2
+
+device_setup_2_screen.dart
+
+Same layout as Step 1, different image
+
+200:5440
+
+Device Setup Step 3
+
+device_setup_3_screen.dart
+
+Loader + status text, syncing feedback
+
+200:6032
+
+Installation Checklist (loading)
+
+checklist_screen.dart
+
+4 steps with radio/tick, Loader widget, multi-line headline
+
+200:6687
+
+Loading Screen
+
+loading_screen.dart
+
+120×120dp logo/mascot image centered at y=300
+
+200:5924
+
+Summary / Completion
+
+summary_screen.dart
+
+Customer info card, photo thumbnails, primary CTA
+
+
+
+10. REUSABLE COMPONENT SPECS
+
+
+
+Top App Bar (PA_Headers)
+
+Present on all screens. Always 360×80dp. Contains:
+
+Status bar: 360×24dp — time (left), battery/wifi/cellular icons (right)
+
+Header row: 360×56dp — close/back icon (left 48×48dp), title text, optional trailing icons
+
+
+
+Extended Top App Bar (with title block)
+
+Some screens have an additional title block below the 56dp header:
+
+Title block: 360×56dp — headline text at 16px left, optional subheading
+
+Extended variant: 360×96dp title block for multi-line headlines
+
+
+
+Camera Screen Layout
+
+All Aadhaar capture screens (nodes 200:5853, 200:6879, 200:7036, 200:7118, 200:7145) share this structure:
+
+Background: full-screen CameraPreview behind everything
+
+Top bar: 360×80dp (status bar + header only, no title extension)
+
+flash_on icon: 24×24dp at position x=320, y=40
+
+Overlay guide rect: 328×199dp at y=216, rounded corners
+
+Hindi hint text above rect: x=16, y=172, 328×32dp
+
+Shutter button: 64×64dp circle at x=148, y=616 (always bottom of camera frame)
+
+
+
+Primary CTA Button
+
+Appears inside an Action bar frame (360×80dp) at the very bottom of screens:
+
+Full-width button: 328×48dp at x=16, y=16 within the action bar
+
+Background: #D9008D (pri_cta_bg)  |  Text: #FAF9FC  |  Radius: 8dp
+
+Label: L1_16_Bold — Noto Sans 16dp/700
+
+Disabled state: background #A7A1B2 (pri_cta_disable_bg)
+
+
+
+Checklist / Step Tracker (Installation screens)
+
+Card at x=16, y=192, 328×184dp. Steps use 24×24dp icons with 36dp text area:
+
+Completed step: Icons.check_circle (#D9008D or #008043)
+
+Current step: Radio widget (active)
+
+Pending step: Radio widget (inactive, #A7A1B2)
+
+Loader: 18×18dp CircularProgressIndicator beside current step
+
+
+
+11. FLUTTER CODE TEMPLATES
+
+
+
+11a. app_colors.dart — Paste as-is
+
+import 'package:flutter/material.dart';
+
+
+
+class AppColors {
+
+  // Brand
+
+  static const brandPrimary    = Color(0xFFD9008D);
+
+  static const brandLightBg    = Color(0xFFFFE5F6);
+
+  static const brandSecBg      = Color(0xFFFFCCED);
+
+  // Backgrounds
+
+  static const surface         = Color(0xFFFAF9FC);
+
+  static const neutralSec      = Color(0xFFF1EDF7);
+
+  static const neutralTertiary = Color(0xFFE8E4F0);
+
+  static const neutralDisable  = Color(0xFFD7D3E0);
+
+  static const dark            = Color(0xFF161021);
+
+  static const partnerHeader   = Color(0xFF443152);
+
+  static const partnerPurple   = Color(0xFF60506C);
+
+  static const positiveFocus   = Color(0xFF008043);
+
+  static const infoPrimary     = Color(0xFFF1E5FF);
+
+  static const infoFocus       = Color(0xFF6D17CE);
+
+  static const warningPrimary  = Color(0xFFFFE6CC);
+
+  // Text
+
+  static const textPrimary     = Color(0xFF161021);
+
+  static const textHint        = Color(0xFFA7A1B2);
+
+  static const textOnDark      = Color(0xFFFAF9FC);
+
+  static const textWarning     = Color(0xFFB85C00);
+
+  static const textInfo        = Color(0xFF6D17CE);
+
+  // Strokes
+
+  static const strokeDefault   = Color(0xFFE8E4F0);
+
+  static const strokeFocus     = Color(0xFF352D42);
+
+  static const strokeBrand     = Color(0xFFD9008D);
+
+  // Icons
+
+  static const iconBrand       = Color(0xFFD9008D);
+
+  static const iconActive      = Color(0xFF352D42);
+
+  static const iconInactive    = Color(0xFFA7A1B2);
+
+  static const iconPositive    = Color(0xFF008043);
+
+  static const iconInfo        = Color(0xFF6D17CE);
+
+  static const iconWhite       = Color(0xFFFAF9FC);
+
+  // Actions
+
+  static const ctaBg          = Color(0xFFD9008D);
+
+  static const ctaFg          = Color(0xFFFAF9FC);
+
+  static const ctaDisabledBg  = Color(0xFFA7A1B2);
+
+}
+
+
+
+11b. app_text_styles.dart — Paste as-is
+
+import 'package:google_fonts/google_fonts.dart';
+
+import 'package:flutter/material.dart';
+
+import 'app_colors.dart';
+
+
+
+class AppTextStyles {
+
+  static final d1Bold = GoogleFonts.notoSans(fontSize: 48, fontWeight: FontWeight.w700, height: 1.33, color: AppColors.textPrimary);
+
+  static final t2Bold = GoogleFonts.notoSans(fontSize: 24, fontWeight: FontWeight.w700, height: 1.33, color: AppColors.textPrimary);
+
+  static final t3Bold = GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.w700, height: 1.40, color: AppColors.textPrimary);
+
+  static final t4Bold = GoogleFonts.notoSans(fontSize: 16, fontWeight: FontWeight.w700, height: 1.50, color: AppColors.textPrimary);
+
+  static final t4Reg  = GoogleFonts.notoSans(fontSize: 16, fontWeight: FontWeight.w400, height: 1.50, color: AppColors.textPrimary);
+
+  static final b1Bold = GoogleFonts.notoSans(fontSize: 16, fontWeight: FontWeight.w700, height: 1.50, color: AppColors.textPrimary);
+
+  static final b1Reg  = GoogleFonts.notoSans(fontSize: 16, fontWeight: FontWeight.w400, height: 1.50, color: AppColors.textPrimary);
+
+  static final b2Semi = GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, height: 1.43, color: AppColors.textPrimary);
+
+  static final b2Reg  = GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w400, height: 1.43, color: AppColors.textPrimary);
+
+  static final l1Bold = GoogleFonts.notoSans(fontSize: 16, fontWeight: FontWeight.w700, height: 1.50, color: AppColors.ctaFg);
+
+  static final l2Semi = GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, height: 1.43, color: AppColors.textPrimary);
+
+  static final l2Reg  = GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w400, height: 1.43, color: AppColors.textPrimary);
+
+  static final l3Semi = GoogleFonts.notoSans(fontSize: 12, fontWeight: FontWeight.w600, height: 1.33, color: AppColors.textPrimary);
+
+  static final b3Reg  = GoogleFonts.notoSans(fontSize: 12, fontWeight: FontWeight.w400, height: 1.33, color: AppColors.textPrimary);
+
+}
+
+
+
+11c. camera_screen.dart — Template
+
+import 'package:camera/camera.dart';
+
+import 'package:flutter/material.dart';
+
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'app_colors.dart';
+
+
+
+class CameraScreen extends StatefulWidget {
+
+  final Function(String imagePath) onPhotoCaptured;
+
+  const CameraScreen({required this.onPhotoCaptured, super.key});
+
+  @override State<CameraScreen> createState() => _CameraScreenState();
+
+}
+
+
+
+class _CameraScreenState extends State<CameraScreen> {
+
+  CameraController? _controller;
+
+  bool _flashOn = false;
+
+
+
+  @override void initState() {
+
+    super.initState();
+
+    _initCamera();
+
+  }
+
+
+
+  Future<void> _initCamera() async {
+
+    final cameras = await availableCameras();
+
+    _controller = CameraController(cameras.first, ResolutionPreset.high);
+
+    await _controller!.initialize();
+
+    if (mounted) setState(() {});
+
+  }
+
+
+
+  Future<void> _capturePhoto() async {
+
+    if (_controller == null || !_controller!.value.isInitialized) return;
+
+    final file = await _controller!.takePicture();
+
+    widget.onPhotoCaptured(file.path);
+
+  }
+
+
+
+  @override Widget build(BuildContext context) {
+
+    return Scaffold(
+
+      backgroundColor: Colors.black,
+
+      body: Stack(children: [
+
+        if (_controller?.value.isInitialized == true)
+
+          Positioned.fill(child: CameraPreview(_controller!)),
+
+        // Flash toggle — x=320, y=40
+
+        Positioned(top: 40.h, right: 16.w,
+
+          child: IconButton(
+
+            icon: Icon(_flashOn ? Icons.flash_on : Icons.flash_off,
+
+              color: Colors.white, size: 24.sp),
+
+            onPressed: () => setState(() { _flashOn = !_flashOn; }),
+
+          )),
+
+        // Shutter — x=148, y=616, 64×64dp
+
+        Positioned(bottom: 40.h, left: 148.w,
+
+          child: GestureDetector(
+
+            onTap: _capturePhoto,
+
+            child: Container(width: 64.w, height: 64.h,
+
+              decoration: BoxDecoration(shape: BoxShape.circle,
+
+                color: AppColors.ctaBg)),
+
+          )),
+
+      ]),
+
+    );
+
+  }
+
+}
+
+
+
+12. NAVIGATION FLOW (go_router)
+
+Linear flow only — no back navigation from flow screens. Use push() exclusively.
+
+
+
+GoRouter(
+
+  routes: [
+
+    GoRoute(path: '/',           builder: (c, s) => TaskListScreen()),
+
+    GoRoute(path: '/ack',        builder: (c, s) => AcknowledgementScreen()),
+
+    GoRoute(path: '/customer',   builder: (c, s) => CustomerInfoScreen()),
+
+    GoRoute(path: '/camera',     builder: (c, s) => CameraScreen(...)),
+
+    GoRoute(path: '/aadhaar-f',  builder: (c, s) => AadhaarFrontScreen()),
+
+    GoRoute(path: '/aadhaar-b',  builder: (c, s) => AadhaarBackScreen()),
+
+    GoRoute(path: '/review',     builder: (c, s) => AadhaarReviewScreen()),
+
+    GoRoute(path: '/setup-1',    builder: (c, s) => DeviceSetup1Screen()),
+
+    GoRoute(path: '/setup-2',    builder: (c, s) => DeviceSetup2Screen()),
+
+    GoRoute(path: '/setup-3',    builder: (c, s) => DeviceSetup3Screen()),
+
+    GoRoute(path: '/checklist',  builder: (c, s) => ChecklistScreen()),
+
+    GoRoute(path: '/loading',    builder: (c, s) => LoadingScreen()),
+
+    GoRoute(path: '/summary',    builder: (c, s) => SummaryScreen()),
+
+  ],
+
+)
+
+
+
+13. GITHUB & PACKAGE RESOURCES
+
+Claude Code can fetch documentation from these URLs during the build:
+
+
+
+Package / Resource
+
+URL
+
+Figma Context MCP Server
+
+https://github.com/GLips/Figma-Context-MCP
+
+Flutter camera plugin
+
+https://github.com/flutter/packages/tree/main/packages/camera
+
+camera (pub.dev)
+
+https://pub.dev/packages/camera
+
+image_picker (pub.dev)
+
+https://pub.dev/packages/image_picker
+
+permission_handler (pub.dev)
+
+https://pub.dev/packages/permission_handler
+
+permission_handler (GitHub)
+
+https://github.com/Baseflow/flutter-permission-handler
+
+flutter_screenutil (pub.dev)
+
+https://pub.dev/packages/flutter_screenutil
+
+flutter_screenutil (GitHub)
+
+https://github.com/OpenFlutter/flutter_screenutil
+
+go_router (pub.dev)
+
+https://pub.dev/packages/go_router
+
+go_router (GitHub)
+
+https://github.com/flutter/packages/tree/main/packages/go_router
+
+google_fonts (pub.dev)
+
+https://pub.dev/packages/google_fonts
+
+google_fonts (GitHub)
+
+https://github.com/material-foundation/flutter-packages/tree/main/packages/google_fonts
+
+material_symbols_icons (pub.dev)
+
+https://pub.dev/packages/material_symbols_icons
+
+material_symbols_icons (GitHub)
+
+https://github.com/timmaffett/material_symbols_icons
+
+Noto Sans (Google Fonts)
+
+https://fonts.google.com/noto/specimen/Noto+Sans
+
+Material Icons reference
+
+https://fonts.google.com/icons
+
+Flutter Android deployment
+
+https://docs.flutter.dev/deployment/android
+
+figma-export CLI
+
+https://github.com/RedMadRobot/figma-export
+
+
+
+14. CRITICAL NOTES FOR CLAUDE CODE
+
+
+
+Hindi / Devanagari Script
+
+Your designs contain Hindi text: आधार कार्ड को इस क्षेत्र में रखें, कस्टमर प्रतीक्षा कर रहे हैं, etc. Noto Sans is the ONLY acceptable font — it provides full Devanagari coverage. Never substitute Roboto or any other font. Ensure all string literals containing Hindi are UTF-8 encoded Dart strings.
+
+
+
+Elevation & Shadow
+
+Two shadow levels are defined in the design system:
+
+1dp shadow: BoxShadow(color: Color(0x26000000), offset: Offset(0, 1), blurRadius: 3)
+
+2dp shadow: BoxShadow(color: Color(0x26000000), offset: Offset(0, 2), blurRadius: 6)
+
+
+
+ScreenUtil Initialization
+
+Initialize ScreenUtilInit at app root with designSize: Size(360, 720). Use .w for horizontal, .h for vertical, .sp for font sizes, .r for border radius. Never use hardcoded pixel values.
+
+
+
+Figma Node Fetching Strategy
+
+Always call Figma MCP get_design_context on each node ID BEFORE writing the Flutter code for that screen. Do not rely on this document alone for exact pixel positions — the live Figma data is the source of truth.
+
+
+
+Camera Permission Flow
+
+On first launch of any camera screen, always request camera permission via permission_handler before initializing CameraController. Handle denied and permanently denied states with appropriate UI messaging.
+
+
+
+
+
+Generated from Figma file PwrhO9KnvdZ4NNYwz3B85d · Node 200-7929 · Test Android Flow
+
+Feed this document to Claude Code at the start of every session.
+
