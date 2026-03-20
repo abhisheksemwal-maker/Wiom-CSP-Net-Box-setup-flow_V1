@@ -1,0 +1,23 @@
+# Build outputs
+app/build/
+build/
+.gradle/
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# APKs except the named release
+*.apk
+!Expert App Net Box Setup Flow_Semwal_Kotlin build_V1.apk
+
+# Large files
+*.zip
